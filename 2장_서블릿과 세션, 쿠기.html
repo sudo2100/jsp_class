@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2장. 서블릿과 세션, 쿠키 — 학습 교안</title>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#e76f00;--accent2:#2c3e50;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#fff5e9;--lab-line:#e76f00;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#5382a1,#2c3e50);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.9;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.92}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.16);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#c85f00}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  .note{background:#fffbea;border-left:5px solid #f0c000;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .note .lbl{font-weight:800;color:#a67c00}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);color:#abb2bf;border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;margin:10px 0}
+  pre .k{color:#c678dd}pre .t{color:#e5c07b}pre .s{color:#98c379}pre .c{color:#7f848e;font-style:italic}pre .f{color:#61afef}pre .n{color:#d19a66}pre .g{color:#56b6c2}
+  .out{background:#1b1e24;color:#9fd18a;border-radius:8px;padding:10px 14px;font-family:Consolas,"D2Coding",monospace;font-size:.86rem;margin:6px 0 0}
+  .browser{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:6px 0 0;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .browser .bar{background:#e9edf2;padding:7px 12px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--line)}
+  .browser .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .browser .bar .r{background:#ff5f57}.browser .bar .y{background:#febc2e}.browser .bar .gr{background:#28c840}
+  .browser .bar .url{margin-left:8px;background:#fff;border-radius:6px;padding:3px 10px;font-size:.78rem;color:var(--muted);font-family:Consolas,monospace;flex:1}
+  .browser .page{padding:16px 18px;font-size:.95rem}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#f0f4f8;color:var(--accent2)}td.c,th.c{text-align:center}
+  details{margin-top:10px;background:#fff;border:1px solid #f0d9bf;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#c85f00}details pre{margin-top:10px}
+  .steps{counter-reset:step;list-style:none;padding-left:0;margin:10px 0}
+  .steps li{position:relative;padding-left:40px;margin:11px 0}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-1px;width:26px;height:26px;background:var(--ex-line);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+  figure{margin:14px 0;text-align:center}
+  figure img{max-width:100%;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.07);background:#fff}
+  figure figcaption{font-size:.83rem;color:var(--muted);margin-top:7px}
+  .imgrow{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .imgrow figure{flex:1 1 300px;margin:8px 0}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Java 웹 &amp; JSP · Chapter 02 · 학습 교안</div>
+  <h1>서블릿과 세션, 쿠키</h1>
+  <p>HTTP 무상태(Stateless) 극복 기술 — 세션·쿠키의 원리부터 장바구니·로그인 실습까지</p>
+  <div class="tags"><span>🧩 서블릿(Servlet)</span><span>🔄 HttpServlet</span><span>🔑 세션(Session)</span><span>🍪 쿠키(Cookie)</span><span>🛒 장바구니·로그인 실습</span></div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+        <li><a href="#m1">서블릿(Servlet)이란? &amp; HttpServlet과 동작 흐름</a></li>
+        <li><a href="#m2">서블릿 만들기 &amp; 응답·요청 처리 &amp; 로그인 실습</a></li>
+        <li><a href="#m3">세션·쿠키가 필요한 이유 &amp; 세션 동작 원리와 JSESSIONID</a></li>
+        <li><a href="#m4">세션 생성·조회·삭제 &amp; 유효시간 설정 &amp; 장바구니 실습</a></li>
+        <li><a href="#m5">쿠키(cookie)의 개념과 동작 원리</a></li>
+        <li><a href="#m6">쿠키 생성·조회·삭제</a></li>
+      </ol>
+  </nav>
+
+  <!-- ================= MODULE 1 ================= -->
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 서블릿(Servlet)이란? &amp; HttpServlet과 동작 흐름</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>서블릿의 개념과 <b>서버 사이드 프로그램</b>으로서의 역할을 설명할 수 있다.</li>
+      <li>서블릿의 장점과 한계를 이해하고, JSP·Spring으로 발전한 배경을 안다.</li>
+      <li>Java EE(Jakarta EE) API 안에서 서블릿의 위치를 파악한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 서블릿의 개념</h3>
+      <p><b>서블릿(Servlet)</b>은 자바(Java) 기반의 웹 프로그래밍 기술로, <b>웹 서버에서 실행</b>됩니다. 클라이언트(보통 웹 브라우저)의 <b>요청(Request)</b>을 처리하고 <b>응답(Response)</b>을 만들어 반환하는 <b>서버 사이드 프로그램</b>입니다.</p>
+      <div class="note"><div class="lbl">💡 이름의 유래</div>
+        <b>Servlet = Server + Applet</b><br>
+        웹 서버에서 실행되는 자바 클래스로, 클라이언트의 요청을 받아 <b>동적 웹 페이지</b>(DB 조회, 계산, 사용자 입력 처리 등)를 생성합니다. 일반적으로 HTTP 프로토콜 기반으로 동작하며, 가장 대표적인 구현체는 <code>HttpServlet</code>입니다.</div>
+    </div>
+
+    <div class="concept"><h3 class="blk">✅ 서블릿의 장점</h3>
+      <ul>
+        <li><b>자바 언어 기반</b> → 객체지향적이고 안정적</li>
+        <li><b>플랫폼 독립적</b> → JVM만 있으면 어디서든 실행 가능</li>
+        <li>강력한 <b>라이브러리 &amp; API 지원</b> (DB, 네트워크 등)</li>
+        <li>JSP, Spring Framework 같은 <b>웹 기술의 기반</b></li>
+      </ul>
+      <h3 class="blk">⚠️ 서블릿의 한계</h3>
+      <ul>
+        <li>순수 서블릿으로 HTML을 출력하려면 <code>out.println("&lt;h1&gt;...&lt;/h1&gt;")</code> 같은 코드가 <b>복잡해짐</b></li>
+        <li><b>뷰(View) 처리에 불편</b> → JSP와 함께 사용하면서 <b>MVC 패턴</b>이 도입됨</li>
+        <li>이후 Spring, Spring Boot 같은 프레임워크가 발전하며 더 효율적인 개발 방식이 확산됨</li>
+      </ul>
+    </div>
+
+    <div class="concept"><h3 class="blk">🗺️ Java EE API 속의 서블릿</h3>
+      <p>서블릿은 Java EE(현재의 <b>Jakarta EE</b>) 스펙에 정의된 웹 표준 API의 하나입니다. 서블릿 컨테이너(Tomcat 등)가 이 API를 구현하여 서블릿을 실행합니다.</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">docs.oracle.com/.../javax/servlet/http/HttpServlet.html</span></div>
+        <div class="page">
+          <div style="color:#888;font-size:.82rem">javax.servlet.http</div>
+          <h2 style="margin:2px 0 10px">Class HttpServlet</h2>
+          <div style="font-family:Consolas,"D2Coding",monospace;font-size:.86rem;color:#333;line-height:1.7">java.lang.Object<br>&nbsp;&nbsp;└─ javax.servlet.GenericServlet<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ javax.servlet.http.<b>HttpServlet</b></div>
+          <hr>
+          <p style="margin:10px 0 0;font-size:.9rem">HTTP 서블릿을 만들기 위해 상속하는 추상 클래스. <code>doGet()</code>·<code>doPost()</code> 등을 오버라이딩해 사용한다.</p>
+        </div>
+      </div>
+    </div>
+  
+
+    <h3 class="blk">🔄 HttpServlet과 동작 흐름</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>HttpServlet</code>이 무엇이며 왜 상속받아 사용하는지 설명할 수 있다.</li>
+      <li><code>doGet()</code>과 <code>doPost()</code>의 차이를 구분한다.</li>
+      <li>요청부터 응답까지 서블릿 실행 흐름을 순서대로 설명할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 HttpServlet이란?</h3>
+      <ul>
+        <li><code>HttpServlet</code>은 <code>Servlet</code>의 대표적인 <b>구현 클래스</b>이다.</li>
+        <li>클라이언트와 서버 간에 <b>HTTP 프로토콜 기반</b>의 요청과 응답을 처리하는 데 최적화된 서블릿이다.</li>
+        <li>패키지 : <code>javax.servlet.http.HttpServlet</code> (Servlet 3.x까지) 또는 <code>jakarta.servlet.http.HttpServlet</code> (Servlet 4.x 이상, Jakarta EE)</li>
+        <li>보통 <code>Servlet</code> 인터페이스를 직접 구현하지 않고, <b><code>HttpServlet</code>을 상속받아 필요한 메서드만 오버라이딩</b>해서 사용한다.</li>
+      </ul>
+    </div>
+
+    <div class="concept"><h3 class="blk">🔧 HttpServlet의 주요 메서드</h3>
+<pre><span class="k">protected</span> <span class="k">void</span> <span class="f">doGet</span>(<span class="t">HttpServletRequest</span> req, <span class="t">HttpServletResponse</span> resp)
+        <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span>;
+
+<span class="k">protected</span> <span class="k">void</span> <span class="f">doPost</span>(<span class="t">HttpServletRequest</span> req, <span class="t">HttpServletResponse</span> resp)
+        <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span>;</pre>
+      <table>
+        <tr><th>메서드</th><th>처리 요청</th><th>대표 예시</th></tr>
+        <tr><td><code>doGet()</code></td><td>GET 요청 처리</td><td>브라우저 주소창 요청, 링크 클릭 등</td></tr>
+        <tr><td><code>doPost()</code></td><td>POST 요청 처리</td><td>폼(form) 제출, JSON 데이터 전송 등</td></tr>
+      </table>
+    </div>
+
+    <div class="concept"><h3 class="blk">🔄 Servlet의 실행 흐름</h3>
+      <p>클라이언트 요청이 들어오면 서블릿 컨테이너(Tomcat)가 아래 순서로 처리합니다.</p>
+<pre><span class="c">[클라이언트(브라우저)]</span>
+          │  HTTP 요청
+          ▼
+   <span class="t">[웹 서버 + 서블릿 컨테이너(Tomcat 등)]</span>
+          │
+          ├─&gt; 요청 분석
+          │
+          ├─&gt; 해당 서블릿 로딩 (없으면 메모리에 로드 &amp; <span class="f">init()</span> 실행)
+          │
+          ├─&gt; <span class="f">service()</span> 실행
+          │        ├─ GET  → <span class="f">doGet()</span>
+          │        └─ POST → <span class="f">doPost()</span>
+          │
+          └─&gt; 결과 HTML/JSON 등 생성 → HTTP 응답
+          ▼
+<span class="c">[클라이언트(브라우저)]</span></pre>
+      <div class="note"><div class="lbl">💡 생명주기(Life Cycle) 메서드</div>
+        <b>init()</b> : 서블릿이 처음 메모리에 로드될 때 <b>한 번</b> 실행(초기화) · <b>service()</b> : 요청마다 실행되어 <code>doGet()</code>/<code>doPost()</code>로 분기 · <b>destroy()</b> : 서블릿이 메모리에서 제거될 때 <b>한 번</b> 실행(정리)</div>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 서블릿 만들기 &amp; 응답·요청 처리 &amp; 로그인 실습</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>STS/Eclipse에서 서블릿 클래스를 생성하는 절차를 따라할 수 있다.</li>
+      <li><b>애너테이션(@WebServlet)</b>을 이용한 URL 매핑 방식을 이해한다.</li>
+      <li>서블릿 매핑 이름으로 브라우저에서 요청하는 방법을 안다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">🧭 서블릿 생성의 큰 그림</h3>
+      <ol class="steps">
+        <li>사용자 정의 서블릿 클래스 만들기 (<code>HttpServlet</code> 상속)</li>
+        <li>서블릿 생명주기 메서드 확인 : <code>init()</code>, <code>destroy()</code></li>
+        <li>요청 처리 메서드 작성 : <code>service()</code>, <code>doGet()</code>, <code>doPost()</code></li>
+        <li>웹 브라우저에서 <b>서블릿 매핑 이름</b>으로 요청</li>
+      </ol>
+    </div>
+
+    <div class="concept"><h3 class="blk">📂 프로젝트 구조</h3>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">Project Explorer · jweb01</span></div>
+        <div class="page">
+          <div style="font-family:Consolas,"D2Coding",monospace;font-size:.88rem;line-height:1.85;color:#333">
+            📂 <b>Java Resources</b><br>
+            &nbsp;&nbsp;📂 src/main/java<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;📂 <b>servlet</b><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 HelloServlet.java<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 LoginServlet.java<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 RegisterServlet.java<br>
+            &nbsp;&nbsp;📂 src/main/webapp ▸ 📂 servlet ▸ 📄 register.jsp
+          </div>
+        </div>
+      </div>
+      <p class="muted">서블릿(<code>.java</code>)은 <code>src/main/java</code>의 패키지에, JSP 폼(<code>.jsp</code>)은 <code>src/main/webapp</code> 아래에 둡니다.</p>
+    </div>
+
+    <div class="ex"><div class="lbl">🛠️ 실습 : HelloServlet 생성 절차</div>
+      <p class="muted">Java package를 우클릭 → <b>New &gt; Servlet</b> 메뉴로 서블릿 생성을 시작합니다.</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">STS · Java Package 우클릭 ▸ New ▸ Servlet</span></div>
+        <div class="page">
+          <div style="font-size:.9rem;line-height:1.9">
+            <b>New</b> ▸<br>
+            <span style="color:#888">&nbsp;&nbsp;Class / Interface / Enum / …</span><br>
+            &nbsp;&nbsp;<span style="background:#eef4ff;border-radius:5px;padding:1px 8px"><b>Servlet</b></span> &nbsp;← 선택
+          </div>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">STS · Create Servlet</span></div>
+        <div class="page">
+          <div style="font-weight:700;margin-bottom:10px">Create Servlet</div>
+          <table style="font-family:Consolas,"D2Coding",monospace;font-size:.86rem;border-collapse:collapse">
+            <tr><td style="padding:3px 12px 3px 0;color:#555">Java package :</td><td>servlet</td></tr>
+            <tr><td style="padding:3px 12px 3px 0;color:#555">Class name :</td><td><b>HelloServlet</b></td></tr>
+            <tr><td style="padding:3px 12px 3px 0;color:#555">Superclass :</td><td>javax.servlet.http.HttpServlet</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">STS · Create Servlet — URL Mappings</span></div>
+        <div class="page">
+          <div style="font-weight:700;margin-bottom:10px">URL Mappings</div>
+          <div style="font-family:Consolas,"D2Coding",monospace;font-size:.9rem">/HelloServlet &nbsp;→&nbsp; <b>Edit</b> &nbsp;→&nbsp; <span style="background:#fff5e9;border-radius:5px;padding:1px 8px"><b>/hello</b></span></div>
+          <p style="margin:10px 0 0;font-size:.88rem;color:#555">필요 항목을 체크하고 매핑 이름을 <b>/hello</b>로 변경한다.</p>
+        </div>
+      </div>
+      <div class="note"><div class="lbl">💡 핵심</div> 생성 마법사의 <b>URL Mappings</b>를 <code>/hello</code>로 지정하면, 브라우저에서 <code>http://localhost:8080/프로젝트명/hello</code>로 이 서블릿을 호출할 수 있습니다.</div>
+    </div>
+
+    <div class="concept"><h3 class="blk">🏷️ 애너테이션(@)을 이용한 URL 매핑</h3>
+      <p>서블릿 클래스 위에 <code>@WebServlet("/매핑이름")</code>을 붙이면 별도의 <code>web.xml</code> 설정 없이 URL과 서블릿이 연결됩니다.</p>
+<pre><span class="n">@WebServlet</span>(<span class="s">"/hello"</span>) <span class="c">// URL 패턴 매핑 (http://localhost:8080/프로젝트명/hello)</span>
+<span class="k">public class</span> <span class="t">HelloServlet</span> <span class="k">extends</span> <span class="t">HttpServlet</span> {
+    <span class="k">private static final long</span> <span class="n">serialVersionUID</span> = <span class="n">1L</span>;
+}</pre>
+    </div>
+  
+
+    <h3 class="blk">📤 서블릿의 응답 처리 &amp; HttpServletRequest · 회원가입 실습</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>MIME-TYPE의 의미와 <code>setContentType()</code>의 역할을 설명할 수 있다.</li>
+      <li><code>PrintWriter</code>로 HTML 응답을 생성하는 과정을 이해한다.</li>
+      <li>HelloServlet 실습으로 응답 처리 전체 흐름을 구현한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 응답 처리 4단계</h3>
+      <ol class="steps">
+        <li><code>setContentType()</code>으로 <b>MIME-TYPE 지정</b></li>
+        <li>데이터를 출력할 <b><code>PrintWriter</code> 객체 생성</b></li>
+        <li>출력 데이터를 <b>HTML 형식</b>으로 만들기</li>
+        <li><code>print()</code> / <code>println()</code>으로 <b>데이터 출력</b></li>
+      </ol>
+      <div class="note"><div class="lbl">💡 MIME-TYPE 이란?</div>
+        톰캣 컨테이너에 미리 설정해 놓은 <b>데이터 종류</b>입니다. 서버에서 웹 브라우저로 데이터를 전송할 때 <b>데이터 종류를 지정해서</b> 전송합니다. 예) <code>text/html</code>, <code>application/json</code>, <code>image/png</code></div>
+    </div>
+
+    <h3 class="blk">⚙️ 서버의 웹 모듈 path 변경 — "/"(루트 경로)</h3>
+      <p class="muted">서블릿 매핑을 <code>/register</code>처럼 <b>루트 기준</b>으로 요청하려면, 톰캣 서버의 <b>Web Modules</b>에서 해당 모듈의 <b>Path</b>를 <code>/</code>(루트 경로)로 바꿉니다. (모듈 더블클릭 → <b>Path</b>를 <code>/</code>로 설정)</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">Tomcat · Web Modules</span></div>
+        <div class="page">
+          <table style="font-size:.86rem;border-collapse:collapse;width:100%">
+            <tr style="background:#f0f4f8"><th style="border:1px solid #e4e7eb;padding:5px 8px;text-align:left">Path</th><th style="border:1px solid #e4e7eb;padding:5px 8px;text-align:left">Document Base</th><th style="border:1px solid #e4e7eb;padding:5px 8px;text-align:left">Module</th></tr>
+            <tr><td style="border:1px solid #e4e7eb;padding:5px 8px"><b>/</b></td><td style="border:1px solid #e4e7eb;padding:5px 8px">jweb01</td><td style="border:1px solid #e4e7eb;padding:5px 8px">jweb01</td></tr>
+          </table>
+          <div style="margin-top:10px;border:1px solid #e4e7eb;border-radius:8px;padding:10px 12px;font-size:.86rem;background:#fafbfc">
+            <b>Edit Web Module</b><br>Document base : jweb01<br>Path : <span style="background:#fff5e9;border-radius:5px;padding:1px 8px"><b>/</b></span> &nbsp; ☑ Auto reloading enabled
+          </div>
+        </div>
+      </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 : HelloServlet — 현재 시간 출력</div>
+<pre><span class="n">@WebServlet</span>(<span class="s">"/hello"</span>) <span class="c">// URL 패턴 매핑</span>
+<span class="k">public class</span> <span class="t">HelloServlet</span> <span class="k">extends</span> <span class="t">HttpServlet</span> {
+    <span class="k">private static final long</span> <span class="n">serialVersionUID</span> = <span class="n">1L</span>;
+
+    <span class="k">protected void</span> <span class="f">doGet</span>(<span class="t">HttpServletRequest</span> request, <span class="t">HttpServletResponse</span> response)
+            <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> {
+        <span class="c">// 응답 컨텐츠 타입 설정(type, 한글 인코딩)</span>
+        response.<span class="f">setContentType</span>(<span class="s">"text/html; charset=UTF-8"</span>);
+
+        <span class="c">// 출력 스트림</span>
+        <span class="t">PrintWriter</span> out = response.<span class="f">getWriter</span>();
+
+        <span class="c">// HTTP 응답</span>
+        out.<span class="f">println</span>(<span class="s">"&lt;!DOCTYPE html&gt;&lt;html&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;head&gt;&lt;title&gt;Hello Servlet&lt;/title&gt;&lt;/head&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;body&gt;&lt;h2&gt;Hello Servlet!&lt;/h2&gt;&lt;hr&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"현재 날짜와 시간은 "</span> + <span class="t">LocalDateTime</span>.<span class="f">now</span>());
+        out.<span class="f">println</span>(<span class="s">"&lt;/body&gt;&lt;/html&gt;"</span>);
+    }
+}</pre>
+      <p class="muted">실행 결과 — 브라우저에서 <code>localhost:8080/hello</code> 요청 시 :</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/hello</span></div>
+        <div class="page">
+          <h2 style="margin:4px 0 10px">Hello Servlet!</h2>
+          <hr>
+          <p style="margin:10px 0 0">현재 날짜와 시간은 2025-10-02T05:24:28.416907400</p>
+        </div>
+      </div>
+    </div>
+  <h3 class="blk">📨 HttpServletRequest · 회원가입 실습</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li><code>HttpServletRequest</code>의 역할과 주요 메서드를 설명할 수 있다.</li>
+      <li>폼(form)의 <code>name</code> 값을 <code>getParameter()</code>로 받아 처리할 수 있다.</li>
+      <li>회원가입 폼(register.jsp)과 처리 서블릿(RegisterServlet)을 구현한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 HttpServletRequest 란?</h3>
+      <ul>
+        <li>웹 서버에 들어오는 <b>HTTP 요청에 대한 모든 정보</b>를 담고 있는 객체이다.</li>
+        <li>클라이언트의 요청을 받아 서버가 처리할 수 있도록 <b>HTTP 요청 메시지를 파싱</b>하여 필요한 데이터를 제공한다.</li>
+        <li>클라이언트의 <b>요청 메시지, 요청 헤더, 요청 파라미터</b> 등을 조회하는 데 사용된다.</li>
+      </ul>
+      <h3 class="blk">🔧 HttpServletRequest 주요 메서드</h3>
+      <table>
+        <tr><th>메서드</th><th>반환유형</th><th>설명</th></tr>
+        <tr><td><code>getParameter(String name)</code></td><td>String</td><td>요청 파라미터 이름이 name인 값을 전달받음</td></tr>
+        <tr><td><code>getParameterValues(String name)</code></td><td>String[ ]</td><td>요청 파라미터 이름이 name인 <b>모든 값</b>을 배열 형태로 전달받음</td></tr>
+        <tr><td><code>getParameterNames()</code></td><td>java.util.Enumeration</td><td>모든 요청 파라미터의 이름을 Enumeration 객체 타입으로 전달받음</td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ① 회원가입 폼 — register.jsp</div>
+      <p class="muted"><b>이 파일에서 톰캣 서버를 실행</b>합니다. 요청 URL(매핑) : <code>servlet/register.jsp</code></p>
+<pre><span class="g">&lt;h2&gt;</span>회원 가입<span class="g">&lt;/h2&gt;</span>
+<span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"/register"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+    <span class="g">&lt;ul&gt;</span>
+        <span class="g">&lt;li&gt;</span>
+            <span class="g">&lt;label</span> <span class="f">for</span>=<span class="s">"uname"</span><span class="g">&gt;</span>이름 : <span class="g">&lt;/label&gt;</span>
+            <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">id</span>=<span class="s">"uname"</span> <span class="f">name</span>=<span class="s">"uname"</span><span class="g">&gt;</span>
+        <span class="g">&lt;/li&gt;</span>
+        <span class="g">&lt;li&gt;</span>
+            <span class="g">&lt;label</span> <span class="f">for</span>=<span class="s">"email"</span><span class="g">&gt;</span>이메일 : <span class="g">&lt;/label&gt;</span>
+            <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">id</span>=<span class="s">"email"</span> <span class="f">name</span>=<span class="s">"email"</span><span class="g">&gt;</span>
+        <span class="g">&lt;/li&gt;</span>
+        <span class="g">&lt;li&gt;</span>
+            <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"submit"</span> <span class="f">value</span>=<span class="s">"가입"</span><span class="g">&gt;</span>
+        <span class="g">&lt;/li&gt;</span>
+    <span class="g">&lt;/ul&gt;</span>
+<span class="g">&lt;/form&gt;</span></pre>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/servlet/register.jsp</span></div>
+        <div class="page">
+          <h2 style="margin:4px 0 12px">회원 가입</h2>
+          <ul style="list-style:none;padding:0;margin:0;line-height:2.2">
+            <li>이름 : <input type="text" value="김기용" style="padding:3px 6px;background:#eef2ff;border:1px solid #cfd8f5;border-radius:4px"></li>
+            <li>이메일 : <input type="text" value="today@space.com" style="padding:3px 6px;border:1px solid #ccc;border-radius:4px"></li>
+            <li><button style="padding:4px 14px;margin-top:4px">가입</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ② 처리 서블릿 — RegisterServlet</div>
+      <p class="muted">폼의 <code>method</code>가 <code>post</code>이므로 <b><code>doPost()</code></b>를 사용합니다.</p>
+<pre><span class="n">@WebServlet</span>(<span class="s">"/register"</span>) <span class="c">// http://localhost:8080/register</span>
+<span class="k">public class</span> <span class="t">RegisterServlet</span> <span class="k">extends</span> <span class="t">HttpServlet</span> {
+    <span class="k">private static final long</span> <span class="n">serialVersionUID</span> = <span class="n">1L</span>;
+
+    <span class="k">protected void</span> <span class="f">doPost</span>(<span class="t">HttpServletRequest</span> request, <span class="t">HttpServletResponse</span> response)
+            <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> {
+        <span class="c">// request.setCharacterEncoding("utf-8"); // 한글 깨짐(인코딩 설정)</span>
+
+        <span class="c">// 요청 입력값 받기</span>
+        <span class="t">String</span> name  = request.<span class="f">getParameter</span>(<span class="s">"uname"</span>);
+        <span class="t">String</span> email = request.<span class="f">getParameter</span>(<span class="s">"email"</span>);
+
+        <span class="c">// 응답 설정</span>
+        response.<span class="f">setContentType</span>(<span class="s">"text/html; charset=utf-8"</span>);
+        <span class="t">PrintWriter</span> out = response.<span class="f">getWriter</span>();
+
+        out.<span class="f">println</span>(<span class="s">"&lt;!DOCTYPE html&gt;&lt;html&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;head&gt;&lt;title&gt;회원 가입&lt;/title&gt;&lt;/head&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;body&gt;&lt;h2&gt;회원 등록 결과&lt;/h2&gt;&lt;hr&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;p&gt;이름: "</span> + name + <span class="s">"&lt;/p&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;p&gt;이메일: "</span> + email + <span class="s">"&lt;/p&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;a href='/servlet/register.jsp'&gt;다시 입력&lt;/a&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;/body&gt;&lt;/html&gt;"</span>);
+    }
+}</pre>
+      <p class="muted" style="margin:16px 0 4px">▶ 실행 결과 — 회원가입 폼 제출 시</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/register</span></div>
+        <div class="page">
+          <h2 style="margin:4px 0 12px">회원 등록 결과</h2>
+          <hr>
+          <p style="margin:12px 0 0">이름: 기용</p>
+          <p style="margin:12px 0">이메일: kiyongee2@gmail.com</p>
+          <p style="margin:12px 0 0"><a href="#" onclick="return false" style="color:#5b8def">다시 입력</a></p>
+        </div>
+      </div>
+      <div class="note"><div class="lbl">⚠️ 한글 깨짐 주의</div> POST로 전송된 한글이 깨지면 <b>입력값을 읽기 전에</b> <code>request.setCharacterEncoding("utf-8");</code>를 호출하세요.</div>
+    </div>
+  
+
+    <h3 class="blk">🔐 로그인 실습 (실습문제)</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>지금까지 배운 폼 + 서블릿 처리 흐름을 스스로 구현할 수 있다.</li>
+    </ul></div>
+
+    <div class="lab"><div class="lbl">✏️ 실습문제</div>
+      <h4>실습 2-1. 로그인 기능 구현</h4>
+      <p>아래 조건대로 로그인 기능이 동작하도록 구현하세요.</p>
+      <ul>
+        <li>로그인 폼 : <code>loginForm.jsp</code> (아이디 · 비밀번호 입력)</li>
+        <li>처리 서블릿 : <code>LoginServlet.java</code></li>
+        <li>서블릿 매핑 : <code>/login</code></li>
+      </ul>
+      <details><summary>정답 예시 보기</summary>
+        <p class="muted">① 로그인 폼 — loginForm.jsp</p>
+<pre><span class="g">&lt;h2&gt;</span>로그인<span class="g">&lt;/h2&gt;</span>
+<span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"/login"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+    <span class="g">&lt;p&gt;</span>아이디 : <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">name</span>=<span class="s">"userid"</span><span class="g">&gt;&lt;/p&gt;</span>
+    <span class="g">&lt;p&gt;</span>비밀번호 : <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"password"</span> <span class="f">name</span>=<span class="s">"pwd"</span><span class="g">&gt;&lt;/p&gt;</span>
+    <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"submit"</span> <span class="f">value</span>=<span class="s">"로그인"</span><span class="g">&gt;</span>
+<span class="g">&lt;/form&gt;</span></pre>
+        <p class="muted">② 처리 서블릿 — LoginServlet.java</p>
+<pre><span class="n">@WebServlet</span>(<span class="s">"/login"</span>)
+<span class="k">public class</span> <span class="t">LoginServlet</span> <span class="k">extends</span> <span class="t">HttpServlet</span> {
+    <span class="k">private static final long</span> <span class="n">serialVersionUID</span> = <span class="n">1L</span>;
+
+    <span class="k">protected void</span> <span class="f">doPost</span>(<span class="t">HttpServletRequest</span> request, <span class="t">HttpServletResponse</span> response)
+            <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> {
+        <span class="t">String</span> id  = request.<span class="f">getParameter</span>(<span class="s">"userid"</span>);
+        <span class="t">String</span> pwd = request.<span class="f">getParameter</span>(<span class="s">"pwd"</span>);
+
+        response.<span class="f">setContentType</span>(<span class="s">"text/html; charset=utf-8"</span>);
+        <span class="t">PrintWriter</span> out = response.<span class="f">getWriter</span>();
+
+        <span class="k">if</span> (<span class="s">"admin"</span>.<span class="f">equals</span>(id) &amp;&amp; <span class="s">"1234"</span>.<span class="f">equals</span>(pwd)) {
+            out.<span class="f">println</span>(<span class="s">"&lt;h2&gt;"</span> + id + <span class="s">"님 환영합니다!&lt;/h2&gt;"</span>);
+        } <span class="k">else</span> {
+            out.<span class="f">println</span>(<span class="s">"&lt;h2&gt;로그인 실패&lt;/h2&gt;"</span>);
+            out.<span class="f">println</span>(<span class="s">"&lt;a href='/servlet/loginForm.jsp'&gt;다시 로그인&lt;/a&gt;"</span>);
+        }
+    }
+}</pre>
+        <p class="muted">폼의 <code>method="post"</code>이므로 서블릿에서는 <code>doPost()</code>로 받아 <code>getParameter()</code>로 아이디·비밀번호를 읽어 검증합니다.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> 세션·쿠키가 필요한 이유 &amp; 세션 동작 원리와 JSESSIONID</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>HTTP의 <b>무상태(Stateless)</b> 특성이 무엇인지 설명할 수 있다.</li>
+      <li>상태 유지를 위해 <b>세션과 쿠키</b>가 등장한 배경을 이해한다.</li>
+      <li>세션과 쿠키의 <b>저장 위치 차이</b>(서버 vs 클라이언트)를 구분한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 HTTP는 무상태(Stateless)다</h3>
+      <p>HTTP는 <b>요청(Request)과 응답(Response)</b>으로 이루어지며, 특정 URL을 요청할 때마다 <b>새로운 HTTP 요청</b>이 생성됩니다. 그래서 요청들 사이에 <b>상태를 유지할 방법이 없습니다.</b></p>
+      <div class="note"><div class="lbl">💡 예시</div>
+        <code>/login.jsp</code>에서 로그인을 했더라도 <code>/boards</code> 페이지로 이동하면 <b>새로운 HTTP 요청</b>이므로, 로그인했다는 정보를 확인할 수 없습니다.</div>
+      <p>이러한 HTTP의 무상태 특성을 극복하고자 나온 기술이 <b>쿠키(cookie)</b>와 <b>세션(session)</b>입니다. 이 둘은 특정 데이터를 저장해두고, 페이지를 이동하거나 새로고침하는 등 HTTP 요청이 매번 발생해도 <b>특정 상태(데이터)를 유지</b>할 수 있게 해줍니다.</p>
+    </div>
+
+    <div class="concept"><h3 class="blk">🔑 세션(session)이란?</h3>
+      <ul>
+        <li>클라이언트와 웹 서버 간의 <b>상태를 지속적으로 유지</b>하는 방법이다.</li>
+        <li>사용자 인증을 통해 특정 페이지를 사용할 수 있도록 <b>권한 상태를 유지</b>한다.</li>
+        <li>세션은 <b>오직 웹 서버에 존재하는 객체</b>로, 웹 브라우저마다 하나씩 존재한다. 따라서 <b>브라우저를 닫기 전까지</b> 웹 페이지를 이동하더라도 사용자 정보가 유지된다.</li>
+      </ul>
+      <div class="note"><div class="lbl">🛒 예시</div> 웹 쇼핑몰에서 로그인 후 장바구니·주문 처리 같은 회원 전용 페이지를 이용하다가 다른 페이지에 갔다 돌아와도 <b>로그인 상태가 유지</b>됩니다.</div>
+    </div>
+
+    <div class="concept"><h3 class="blk">⚖️ 세션 vs 쿠키 — 저장 위치가 다르다</h3>
+      <table>
+        <tr><th>구분</th><th>세션(session)</th><th>쿠키(cookie)</th></tr>
+        <tr><td>저장 위치</td><td><b>웹 서버</b></td><td><b>클라이언트(브라우저)</b></td></tr>
+        <tr><td>보안</td><td>상대적으로 안전</td><td>정보가 클라이언트에 남아 <b>보안 취약</b></td></tr>
+        <tr><td>서버 부하</td><td>서버에 저장 → 부하 발생</td><td>클라이언트에 저장 → <b>서버 부하 감소</b></td></tr>
+        <tr><td>유지 기간</td><td>브라우저를 닫으면 소멸(기본)</td><td>설정한 유효기간까지 유지 가능</td></tr>
+      </table>
+    </div>
+  
+
+    <h3 class="blk">🔑 세션 동작 원리와 JSESSIONID</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>세션이 <b>요청 → 발급 → 재요청</b>으로 유지되는 프로세스를 설명할 수 있다.</li>
+      <li><code>JSESSIONID</code>가 무엇이고 어떤 역할을 하는지 이해한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">🔄 세션의 프로세스(Process)</h3>
+      <p class="muted">확인 방법 : 브라우저 &gt; 개발자도구(F12) &gt; <b>Network 탭</b></p>
+      <ol class="steps">
+        <li>브라우저가 서버에 특정 페이지를 요청한다. <span class="muted">예) <code>/createSession.jsp</code> 요청</span></li>
+        <li>서버는 세션을 만들고 <b><code>JSESSIONID</code> 쿠키</b>를 클라이언트에 발급한다. 이후 요청마다 브라우저는 이 세션 ID를 <b>HTTP 요청 헤더에 포함</b>해 보낸다.</li>
+        <li>서버는 요청 헤더의 <code>JSESSIONID</code>를 참조해 자신이 가진 세션 객체를 <b>구분</b>한다. 해당 세션에 로그인 정보가 담겨 있으면 <b>로그인된 것으로 판단</b>한다.</li>
+      </ol>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">DevTools · Network — createSession.jsp · Headers</span></div>
+        <div class="page">
+          <div style="font-weight:700;margin-bottom:6px;font-size:.9rem">▼ Request Headers</div>
+          <div style="font-family:Consolas,"D2Coding",monospace;font-size:.85rem;color:#333;line-height:1.7;background:#f6f8fa;border-radius:6px;padding:10px 12px">Host: localhost:8080<br>Cookie: <b>JSESSIONID</b>=6BCBAE5B0E8938BACEC349B98513F145</div>
+          <p style="margin:10px 0 0;font-size:.88rem;color:#555">이후 요청마다 브라우저가 <b>JSESSIONID</b>를 요청 헤더에 담아 보낸다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept"><h3 class="blk">🆔 JSESSIONID란?</h3>
+      <ul>
+        <li>톰캣 컨테이너에서 <b>세션을 유지하기 위해 발급하는 키</b>이다.</li>
+        <li>HTTP 프로토콜은 <b>stateless</b>하여 요청마다 새 연결이 생성되고 응답 후 끊기므로 상태를 유지할 수 없다.</li>
+        <li>이를 위해 톰캣은 <b><code>JSESSIONID</code> 쿠키를 클라이언트에게 발급</b>하고, 이 값을 통해 세션을 유지한다.</li>
+      </ul>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">세션 유지 원리 — JSESSIONID</span></div>
+        <div class="page">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:.9rem;text-align:center">
+            <div style="border:1px solid #cfd8f5;background:#eef2ff;border-radius:10px;padding:12px 16px">🌐 클라이언트<br>(브라우저)</div>
+            <div style="color:#5b8def;font-weight:700">— JSESSIONID →<br><span style="color:#888;font-weight:400;font-size:.82rem">요청마다 전송</span></div>
+            <div style="border:1px solid #d9e6d0;background:#eafaf1;border-radius:10px;padding:12px 16px">🖥️ 웹 서버<br>(톰캣 · 세션 객체)</div>
+          </div>
+          <p style="margin:12px 0 0;font-size:.88rem;color:#555;text-align:center">톰캣이 발급한 JSESSIONID로 <b>같은 사용자의 세션</b>을 구분·유지한다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> 세션 생성·조회·삭제 &amp; 유효시간 설정 &amp; 장바구니 실습</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>세션 내장 객체의 <b>주요 메서드</b>를 알고 용도를 설명할 수 있다.</li>
+      <li><code>setAttribute()</code>로 세션을 생성하고 <code>getAttribute()</code>로 조회한다.</li>
+      <li><code>invalidate()</code>로 세션을 삭제(로그아웃)할 수 있다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">🔧 세션(session) 내장 객체 메서드</h3>
+      <table>
+        <tr><th>메서드</th><th>설명</th></tr>
+        <tr><td><code>setAttribute(String name, Object value)</code></td><td>세션 속성 이름 name에 value를 할당</td></tr>
+        <tr><td><code>getAttribute(String name)</code></td><td>속성 이름이 name인 값을 <b>Object형으로 반환</b> (형 변환 필요 : Object→String)</td></tr>
+        <tr><td><code>getId()</code></td><td>세션에 할당된 고유 아이디를 String형으로 반환</td></tr>
+        <tr><td><code>setMaxInactiveInterval(int interval)</code></td><td>세션 유지 시간을 <b>초 단위</b>로 설정</td></tr>
+        <tr><td><code>getMaxInactiveInterval()</code></td><td>세션 유지 시간을 반환. <b>기본값 1800초(30분)</b></td></tr>
+        <tr><td><code>invalidate()</code></td><td>현재 세션에 저장된 <b>모든 속성 제거</b></td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ① 세션 생성·세션 ID 확인 — createSession.jsp</div>
+      <p class="muted">JSP는 페이지 요청 시 <code>session</code> 내장 객체가 <b>자동 생성</b>됩니다. 세션 객체 자체와 <code>getId()</code>로 발급된 고유 세션 ID(=JSESSIONID)를 확인해 봅니다.</p>
+<pre><span class="g">&lt;h2&gt;</span>세션 생성<span class="g">&lt;/h2&gt;</span>
+<span class="k">&lt;%=</span> session <span class="k">%&gt;</span>
+
+<span class="g">&lt;p&gt;</span>세션 ID: <span class="k">&lt;%=</span> session.<span class="f">getId</span>() <span class="k">%&gt;</span></pre>
+      <p class="muted" style="margin:16px 0 4px">▶ 실행 결과 — createSession.jsp</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">http://localhost:8080/session/createSession.jsp</span></div>
+        <div class="page">
+          <h2 style="margin:4px 0 12px">세션 생성</h2>
+          <p style="margin:12px 0">org.apache.catalina.session.StandardSessionFacade@24eb0ef7</p>
+          <p style="margin:12px 0 0">세션 ID: 6BCBAE5B0E8938BACEC349B98513F145</p>
+        </div>
+      </div>
+      <div class="note"><span class="lbl">💡 참고</span> &nbsp;<code>&lt;%= session %&gt;</code>는 세션 객체의 <code>toString()</code> 결과(<code>StandardSessionFacade@...</code>)를 출력하고, <code>getId()</code>가 반환하는 값이 바로 브라우저 쿠키로 오가는 <b>JSESSIONID</b>입니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ② 로그인 폼 — session01.jsp</div>
+<pre><span class="g">&lt;h2&gt;</span>로그인<span class="g">&lt;/h2&gt;</span>
+<span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"session01Process.jsp"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+    <span class="g">&lt;p&gt;</span>아이디: <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">name</span>=<span class="s">"uid"</span><span class="g">&gt;&lt;/p&gt;</span>
+    <span class="g">&lt;p&gt;</span>패스워드: <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"password"</span> <span class="f">name</span>=<span class="s">"passwd"</span><span class="g">&gt;&lt;/p&gt;</span>
+    <span class="g">&lt;p&gt;&lt;input</span> <span class="f">type</span>=<span class="s">"submit"</span> <span class="f">value</span>=<span class="s">"로그인"</span><span class="g">&gt;&lt;/p&gt;</span>
+<span class="g">&lt;/form&gt;</span></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ③ 로그인 처리·세션 발급 — session01Process.jsp</div>
+      <p class="muted">세션이 <b>생성(부여)되는 시기는 로그인에 성공한 때</b>입니다. <code>session.setAttribute()</code>로 세션 속성을 만듭니다. (속성 이름 <code>userID</code>, 값은 입력한 아이디(예: <code>space</code>/<code>12345</code>))</p>
+<pre><span class="k">&lt;%</span>
+    <span class="c">// 폼에 입력된 데이터 가져옴</span>
+    <span class="t">String</span> userId = request.<span class="f">getParameter</span>(<span class="s">"uid"</span>);
+    <span class="t">String</span> userPw = request.<span class="f">getParameter</span>(<span class="s">"passwd"</span>);
+
+    out.<span class="f">println</span>(<span class="s">"아이디: "</span> + userId + <span class="s">", 비빌번호: "</span> + userPw);
+    out.<span class="f">println</span>(<span class="s">"&lt;br&gt;"</span>);
+
+    <span class="c">// 로그인 성공 여부</span>
+    <span class="k">if</span>(userId.<span class="f">equals</span>(<span class="s">"space"</span>) &amp;&amp; userPw.<span class="f">equals</span>(<span class="s">"12345"</span>)){
+        session.<span class="f">setAttribute</span>(<span class="s">"userID"</span>, userId); <span class="c">//세션 발급</span>
+        out.<span class="f">println</span>(<span class="s">"세션이 발급되었습니다."</span>);
+    }<span class="k">else</span>{
+        out.<span class="f">println</span>(<span class="s">"&lt;script&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"alert('아이디나 비밀번호가 일치하지 않습니다.')"</span>);
+        out.<span class="f">println</span>(<span class="s">"history.back()"</span>);
+        out.<span class="f">println</span>(<span class="s">"&lt;/script&gt;"</span>);
+    }
+<span class="k">%&gt;</span>
+
+<span class="g">&lt;p&gt;</span><span class="k">&lt;%=</span> session.<span class="f">getAttribute</span>(<span class="s">"userID"</span>) <span class="k">%&gt;</span>님 환영합니다!<span class="g">&lt;/p&gt;</span></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ④ 모든 세션 삭제(로그아웃) — session03.jsp</div>
+<pre><span class="k">&lt;%</span>
+    <span class="t">String</span> id = (<span class="t">String</span>) session.<span class="f">getAttribute</span>(<span class="s">"userID"</span>);
+
+    <span class="c">// 모든 세션 삭제</span>
+    session.<span class="f">invalidate</span>();
+<span class="k">%&gt;</span>
+<span class="g">&lt;p&gt;</span>세션을 삭제했습니다.<span class="g">&lt;/p&gt;</span></pre>
+      <div class="note"><div class="lbl">💡 핵심</div> <code>invalidate()</code>는 현재 세션의 <b>모든 속성을 한 번에 제거</b>합니다. 로그아웃 기능에 사용합니다.</div>
+    </div>
+  
+
+    <h3 class="blk">⏱️ 세션 유효시간 설정</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>세션 유효시간의 개념과 <b>기본값(30분)</b>을 안다.</li>
+      <li><code>setMaxInactiveInterval()</code>로 유효시간을 변경할 수 있다.</li>
+      <li><code>web.xml</code>의 <code>session-config</code>로 전역 설정하는 방법을 이해한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 세션 유효시간이란?</h3>
+      <p>세션을 유지하기 위한 <b>일정 시간</b>으로, <b>기본값은 30분(1800초)</b>입니다. 유효시간을 설정할 때는 <code>session.setMaxInactiveInterval()</code>을 <b>초 단위</b>로 사용합니다.</p>
+<pre><span class="c">// 세션 유효시간 10분(600초) 설정</span>
+session.<span class="f">setMaxInactiveInterval</span>(<span class="n">10</span> * <span class="n">60</span>);</pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ① 유효시간 조회·변경 — timeout.jsp</div>
+<pre><span class="g">&lt;h3&gt;</span>세션 유효시간 변경 전<span class="g">&lt;/h3&gt;</span>
+<span class="k">&lt;%</span>
+    <span class="c">// 30*60 = 1800초</span>
+    <span class="k">int</span> time = session.<span class="f">getMaxInactiveInterval</span>();
+    out.<span class="f">println</span>(time + <span class="s">"초&lt;br&gt;"</span>);
+
+    time = time / <span class="n">60</span>;
+    out.<span class="f">println</span>(time + <span class="s">"분&lt;br&gt;"</span>);
+<span class="k">%&gt;</span>
+
+<span class="g">&lt;h3&gt;</span>세션 유효시간 변경 후<span class="g">&lt;/h3&gt;</span>
+<span class="k">&lt;%</span>
+    <span class="c">// 세션 유효 시간을 5분으로 설정</span>
+    session.<span class="f">setMaxInactiveInterval</span>(<span class="n">5</span> * <span class="n">60</span>);
+
+    <span class="c">// 5*60 = 300초</span>
+    time = session.<span class="f">getMaxInactiveInterval</span>();
+    out.<span class="f">println</span>(time + <span class="s">"초&lt;br&gt;"</span>);
+
+    time = time / <span class="n">60</span>;
+    out.<span class="f">println</span>(time + <span class="s">"분&lt;br&gt;"</span>);
+<span class="k">%&gt;</span></pre>
+      <p class="muted" style="margin:16px 0 4px">▶ 실행 결과 — timeout.jsp</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">http://localhost:8080/session/timeout.jsp</span></div>
+        <div class="page">
+          <h3 style="margin:4px 0 8px">세션 유효시간 변경 전</h3>
+          <p style="margin:8px 0">1800초<br>30분</p>
+          <h3 style="margin:18px 0 8px">세션 유효시간 변경 후</h3>
+          <p style="margin:8px 0 0">300초<br>5분</p>
+        </div>
+      </div>
+      <div class="note"><div class="lbl">🏦 활용 예</div> 은행 사이트에 로그인한 경우, 설정한 시간(예: 10분)이 초 단위로 역카운팅되며 시간이 지나면 <b>자동 로그아웃(<code>session.invalidate()</code>)</b>됩니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ② 전역 설정 — web.xml (servers &gt; web.xml)</div>
+      <p class="muted">특정 페이지가 아니라 <b>애플리케이션 전체</b>의 기본 세션 시간을 바꾸려면 <code>web.xml</code>에서 <code>&lt;session-timeout&gt;</code>(단위: <b>분</b>)을 수정합니다.</p>
+<pre><span class="g">&lt;session-config&gt;</span>
+    <span class="g">&lt;session-timeout&gt;</span>30<span class="g">&lt;/session-timeout&gt;</span>  <span class="c">&lt;!-- 기본 30분 --&gt;</span>
+<span class="g">&lt;/session-config&gt;</span></pre>
+    </div>
+  
+
+    <h3 class="blk">🛒 세션 실습 — 장바구니(Shopping Cart)</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>세션에 <code>ArrayList</code>를 저장해 <b>여러 상품을 누적</b>할 수 있다.</li>
+      <li>로그인 → 상품선택 → 담기 → 확인의 <b>전체 흐름</b>을 구현한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📂 프로그램 소스 목록</h3>
+      <table>
+        <tr><th>파일 이름</th><th>역할</th></tr>
+        <tr><td><code>loginForm.jsp</code></td><td>로그인 폼 화면 — 사용자 이름을 입력하는 양식만 제공</td></tr>
+        <tr><td><code>selProduct.jsp</code></td><td>상품 선택 화면 — 리스트에서 상품을 선택하고 &lt;추가&gt; 버튼을 누름. <b>사용자 세션 설정</b></td></tr>
+        <tr><td><code>addProduct.jsp</code></td><td>선택한 상품을 세션에 넣음. 여러 개를 담아야 하므로 <b>ArrayList</b>를 이용</td></tr>
+        <tr><td><code>cart.jsp</code></td><td>세션이 살아 있고 하나 이상 선택했다면 <b>선택한 상품 목록</b>을 보여줌</td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 ① 로그인 폼 — loginForm.jsp</div>
+<pre><span class="g">&lt;title&gt;</span>로그인<span class="g">&lt;/title&gt;</span>
+<span class="g">&lt;style&gt;</span>
+    <span class="f">#container</span>{ <span class="t">width</span>: 80%; <span class="t">margin</span>: 0 auto; <span class="t">text-align</span>: center; }
+<span class="g">&lt;/style&gt;</span>
+...
+<span class="g">&lt;section</span> <span class="f">id</span>=<span class="s">"container"</span><span class="g">&gt;</span>
+    <span class="g">&lt;h2&gt;</span>로그인<span class="g">&lt;/h2&gt;&lt;hr&gt;</span>
+    <span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"selProduct.jsp"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+        <span class="g">&lt;p&gt;</span>
+            <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">name</span>=<span class="s">"username"</span> <span class="f">placeholder</span>=<span class="s">"이름 입력"</span><span class="g">&gt;</span>
+            <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"submit"</span> <span class="f">value</span>=<span class="s">"로그인"</span><span class="g">&gt;</span>
+        <span class="g">&lt;/p&gt;</span>
+    <span class="g">&lt;/form&gt;</span>
+<span class="g">&lt;/section&gt;</span></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 ② 상품 선택·세션 발급 — selProduct.jsp</div>
+<pre><span class="k">&lt;%</span>
+    <span class="c">// 세션 발급</span>
+    <span class="t">String</span> username = request.<span class="f">getParameter</span>(<span class="s">"username"</span>);
+    session.<span class="f">setAttribute</span>(<span class="s">"sessionName"</span>, username);
+<span class="k">%&gt;</span>
+<span class="g">&lt;section</span> <span class="f">id</span>=<span class="s">"container"</span><span class="g">&gt;</span>
+    <span class="g">&lt;h2&gt;</span>상품 선택<span class="g">&lt;/h2&gt;&lt;hr&gt;</span>
+    <span class="g">&lt;p&gt;&lt;b&gt;</span>[<span class="k">&lt;%=</span> session.<span class="f">getAttribute</span>(<span class="s">"sessionName"</span>) <span class="k">%&gt;</span>]<span class="g">&lt;/b&gt;</span>님 환영합니다.<span class="g">&lt;/p&gt;</span>
+    <span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"addProduct.jsp"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+        <span class="g">&lt;select</span> <span class="f">name</span>=<span class="s">"product"</span><span class="g">&gt;</span>
+            <span class="g">&lt;option</span> <span class="f">value</span>=<span class="s">"사과"</span><span class="g">&gt;</span>사과<span class="g">&lt;/option&gt;</span>
+            <span class="g">&lt;option</span> <span class="f">value</span>=<span class="s">"바나나"</span><span class="g">&gt;</span>바나나<span class="g">&lt;/option&gt;</span>
+            <span class="g">&lt;option</span> <span class="f">value</span>=<span class="s">"포도"</span><span class="g">&gt;</span>포도<span class="g">&lt;/option&gt;</span>
+        <span class="g">&lt;/select&gt;</span>
+        <span class="g">&lt;button</span> <span class="f">type</span>=<span class="s">"submit"</span><span class="g">&gt;</span>추가<span class="g">&lt;/button&gt;</span>
+    <span class="g">&lt;/form&gt;</span>
+    <span class="g">&lt;p&gt;&lt;button</span> <span class="f">onclick</span>=<span class="s">"location.href='cart.jsp'"</span><span class="g">&gt;</span>장바구니<span class="g">&lt;/button&gt;&lt;/p&gt;</span>
+<span class="g">&lt;/section&gt;</span></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 ③ 상품 담기(ArrayList 누적) — addProduct.jsp</div>
+<pre><span class="k">&lt;%</span>
+    request.<span class="f">setCharacterEncoding</span>(<span class="s">"utf-8"</span>);
+
+    <span class="c">// 상품 리스트 생성 및 상품 세션 발급</span>
+    <span class="t">ArrayList</span>&lt;<span class="t">String</span>&gt; productList = (<span class="t">ArrayList</span>) session.<span class="f">getAttribute</span>(<span class="s">"sessionList"</span>);
+    <span class="k">if</span> (productList == <span class="k">null</span>) {
+        productList = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        session.<span class="f">setAttribute</span>(<span class="s">"sessionList"</span>, productList); <span class="c">// 상품 세션 발급</span>
+    }
+
+    <span class="c">// 선택한 상품 받아서 상품리스트에 저장</span>
+    <span class="t">String</span> product = request.<span class="f">getParameter</span>(<span class="s">"product"</span>);
+    productList.<span class="f">add</span>(product);
+<span class="k">%&gt;</span>
+<span class="g">&lt;script&gt;</span>
+    <span class="f">alert</span>(<span class="s">"</span><span class="k">&lt;%=</span> product <span class="k">%&gt;</span><span class="s">가 추가되었습니다."</span>);
+    history.<span class="f">back</span>();
+<span class="g">&lt;/script&gt;</span></pre>
+      <div class="note"><div class="lbl">💡 핵심</div> 세션에서 리스트를 꺼내(<code>getAttribute</code>) <b>없으면 새로 만들고</b>, 있으면 그대로 사용해 상품을 <code>add()</code>합니다. 리스트 객체를 세션에 담아두면 <b>여러 상품이 누적</b>됩니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 ④ 장바구니 확인 — cart.jsp</div>
+<pre><span class="g">&lt;div</span> <span class="f">id</span>=<span class="s">"container"</span><span class="g">&gt;</span>
+    <span class="g">&lt;h2&gt;</span>장바구니<span class="g">&lt;/h2&gt;</span>
+    <span class="g">&lt;h3&gt;</span>선택한 상품 목록<span class="g">&lt;/h3&gt;&lt;hr&gt;</span>
+    <span class="k">&lt;%</span>
+        <span class="c">// 세션 유지</span>
+        <span class="t">ArrayList</span>&lt;<span class="t">String</span>&gt; productList = (<span class="t">ArrayList</span>) session.<span class="f">getAttribute</span>(<span class="s">"sessionList"</span>);
+
+        <span class="c">// 상품 목록</span>
+        <span class="k">if</span> (productList != <span class="k">null</span>) {
+            <span class="k">for</span> (<span class="t">String</span> product : productList) {
+                out.<span class="f">println</span>(product + <span class="s">"&lt;br&gt;"</span>);
+            }
+        }
+    <span class="k">%&gt;</span>
+<span class="g">&lt;/div&gt;</span></pre>
+      <p class="muted" style="margin-top:16px">▶ <b>실행 결과</b> — 장바구니 실습 전체 흐름 (로그인 → 상품 선택 → 담기 → 장바구니 확인)</p>
+
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/carts/loginForm.jsp</span></div>
+        <div class="page" style="text-align:center;padding:22px 18px">
+          <h2 style="margin:6px 0 14px;font-weight:800">로그인</h2>
+          <hr style="border:none;border-top:1px solid #e4e7eb;margin:0 0 18px">
+          <span style="display:inline-flex;gap:8px;align-items:center">
+            <input value="" placeholder="이름 입력" style="padding:6px 10px;border:1px solid #b9c0c8;border-radius:4px;min-width:180px">
+            <button style="padding:6px 14px;border:1px solid #b9c0c8;border-radius:4px;background:#f3f4f6">로그인</button>
+          </span>
+        </div>
+      </div>
+
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/carts/selProduct.jsp</span></div>
+        <div class="page" style="text-align:center;padding:22px 18px">
+          <h2 style="margin:6px 0 14px;font-weight:800">상품 선택</h2>
+          <hr style="border:none;border-top:1px solid #e4e7eb;margin:0 0 18px">
+          <p style="margin:0 0 16px"><b>[이수현]</b>님 환영합니다.</p>
+          <div style="margin-bottom:14px">
+            <select style="padding:6px 10px;border:1px solid #b9c0c8;border-radius:4px">
+              <option>사과</option><option>바나나</option><option>딸기</option>
+            </select>
+            <button style="padding:6px 14px;border:1px solid #b9c0c8;border-radius:4px;background:#f3f4f6">추가</button>
+          </div>
+          <button style="padding:6px 16px;border:1px solid #b9c0c8;border-radius:4px;background:#f3f4f6">장바구니</button>
+        </div>
+      </div>
+
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/carts/addProduct.jsp</span></div>
+        <div class="page" style="background:#ece7ea;padding:22px 18px">
+          <div style="max-width:430px;margin:0 auto;background:#fff;border-radius:10px;box-shadow:0 8px 26px rgba(0,0,0,.18);padding:16px 18px">
+            <div style="color:#3b3b3b;margin-bottom:10px">localhost:8080 내용:</div>
+            <div style="margin-bottom:20px">바나나가 추가되었습니다.</div>
+            <div style="text-align:right">
+              <button style="background:#7a4b5e;color:#fff;border:none;padding:7px 20px;border-radius:8px">확인</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/carts/cart.jsp</span></div>
+        <div class="page" style="text-align:center;padding:22px 18px">
+          <h2 style="margin:6px 0 12px;font-weight:800">장바구니</h2>
+          <h3 style="margin:0 0 14px;font-weight:800">선택한 상품 목록</h3>
+          <hr style="border:none;border-top:1px solid #e4e7eb;margin:0 0 14px">
+          <div style="line-height:2">사과<br>바나나</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> 쿠키(cookie)의 개념과 동작 원리</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>쿠키의 개념과 <b>클라이언트 저장</b> 방식을 설명할 수 있다.</li>
+      <li>쿠키의 <b>작동 원리(생성 → 저장 → 전송)</b>를 이해한다.</li>
+      <li>쿠키의 장점과 <b>보안 단점</b>을 구분한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">📖 쿠키(cookie)란?</h3>
+      <ul>
+        <li>클라이언트와 웹 서버 간의 상태를 유지하는 방법으로, <b>서버가 클라이언트에 저장하는 정보</b>이다.</li>
+        <li>세션과 달리 상태 정보를 <b>웹 서버가 아닌 클라이언트에 저장</b>한다.</li>
+        <li>클라이언트의 일정 폴더에 정보를 저장하므로 <b>웹 서버의 부하를 줄일 수 있으나</b>, 개인 정보 기록이 남아 <b>보안에 문제</b>가 있다.</li>
+      </ul>
+      <div class="note"><div class="lbl">💡 예시</div> 웹 사이트를 처음 방문해 로그인 인증을 하면 아이디·비밀번호를 기록한 쿠키가 만들어지고, 다음부터는 별도 절차 없이 쉽게 접속할 수 있습니다.</div>
+    </div>
+
+    <div class="concept"><h3 class="blk">🔄 쿠키(cookie)의 작동 원리</h3>
+      <ol class="steps">
+        <li><b>쿠키 생성</b> — 웹 서버가 응답하며 쿠키를 만든다. <code>response.addCookie()</code></li>
+        <li><b>쿠키 저장</b> — 브라우저(클라이언트)의 쿠키 저장소에 저장된다.</li>
+        <li><b>쿠키 전송</b> — 이후 요청 시 브라우저가 쿠키를 서버로 보낸다. <code>request.getCookies()</code></li>
+      </ol>
+      <div class="note"><div class="lbl">🗂️ 저장 위치</div> 쿠키는 브라우저별 폴더에 파일로 저장됩니다. (예: Chrome 프로필 폴더 안의 쿠키 파일)</div>
+    </div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> 쿠키 생성·조회·삭제</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>쿠키 내장 객체의 주요 메서드를 알고 사용할 수 있다.</li>
+      <li><code>Cookie</code> 객체 생성 → <code>addCookie()</code>로 클라이언트에 전송한다.</li>
+      <li><code>getCookies()</code>로 조회하고 <code>setMaxAge(0)</code>로 삭제한다.</li>
+    </ul></div>
+
+    <div class="concept"><h3 class="blk">🔧 쿠키(cookie) 내장 객체 메서드</h3>
+      <table>
+        <tr><th>메서드</th><th>설명</th></tr>
+        <tr><td><code>getName()</code></td><td>쿠키의 이름을 반환한다</td></tr>
+        <tr><td><code>getValue()</code></td><td>쿠키에 설정된 값을 반환한다</td></tr>
+        <tr><td><code>setMaxAge(int)</code></td><td>쿠키의 유효 기간을 설정한다 (초 단위, <code>0</code>이면 삭제)</td></tr>
+      </table>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ① 로그인 폼 — cookie01.jsp</div>
+<pre><span class="g">&lt;h2&gt;</span>로그인<span class="g">&lt;/h2&gt;</span>
+<span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"cookie01_process.jsp"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+    <span class="g">&lt;p&gt;</span>아이디: <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">name</span>=<span class="s">"id"</span><span class="g">&gt;&lt;/p&gt;</span>
+    <span class="g">&lt;p&gt;</span>패스워드: <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"password"</span> <span class="f">name</span>=<span class="s">"pwd"</span><span class="g">&gt;&lt;/p&gt;</span>
+    <span class="g">&lt;p&gt;&lt;input</span> <span class="f">type</span>=<span class="s">"submit"</span> <span class="f">value</span>=<span class="s">"로그인"</span><span class="g">&gt;&lt;/p&gt;</span>
+<span class="g">&lt;/form&gt;</span></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ② 쿠키 생성 — cookie01_process.jsp</div>
+      <p class="muted"><code>Cookie</code> 클래스로 쿠키를 생성한 후 <code>response.addCookie()</code>로 <b>로컬 컴퓨터(브라우저)에 전송</b>합니다. (쿠키 이름 <code>userId</code>, 값 <code>id</code>)</p>
+<pre><span class="k">&lt;%</span>
+    <span class="t">String</span> id  = request.<span class="f">getParameter</span>(<span class="s">"id"</span>);
+    <span class="t">String</span> pwd = request.<span class="f">getParameter</span>(<span class="s">"pwd"</span>);
+
+    <span class="k">if</span> (id.<span class="f">equals</span>(<span class="s">"today"</span>) &amp;&amp; pwd.<span class="f">equals</span>(<span class="s">"1234"</span>)) {
+        <span class="c">// Cookie(쿠키이름, 쿠키값)</span>
+        <span class="t">Cookie</span> cookieId = <span class="k">new</span> <span class="t">Cookie</span>(<span class="s">"userId"</span>, id);
+        <span class="t">Cookie</span> cookiePw = <span class="k">new</span> <span class="t">Cookie</span>(<span class="s">"userPw"</span>, pwd);
+
+        <span class="c">// 브라우저(로컬컴퓨터)로 보내줌</span>
+        response.<span class="f">addCookie</span>(cookieId);
+        response.<span class="f">addCookie</span>(cookiePw);
+
+        out.<span class="f">println</span>(<span class="s">"쿠키 생성이 성공했습니다."</span>);
+    } <span class="k">else</span> {
+        out.<span class="f">println</span>(<span class="s">"쿠키 생성이 실패했습니다."</span>);
+    }
+<span class="k">%&gt;</span></pre>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ③ 쿠키 정보 조회 — cookie02.jsp</div>
+      <p class="muted">클라이언트에 저장된 <b>모든 쿠키</b>를 가져오려면 <code>request.getCookies()</code>를 사용합니다. (<code>Cookie[]</code> 배열 반환)</p>
+<pre><span class="k">&lt;%</span>
+    <span class="t">Cookie</span>[] cookies = request.<span class="f">getCookies</span>();
+    out.<span class="f">println</span>(<span class="s">"현재 설정된 쿠키의 개수 =&gt; "</span> + cookies.length + <span class="s">"&lt;br&gt;"</span>);
+    out.<span class="f">println</span>(<span class="s">"===================================&lt;br&gt;"</span>);
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; cookies.length; i++) {
+        out.<span class="f">println</span>(<span class="s">"설정된 쿠키의 속성 이름 ["</span> + i + <span class="s">"] : "</span> + cookies[i].<span class="f">getName</span>() + <span class="s">"&lt;br&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"설정된 쿠키의 속성 값 ["</span> + i + <span class="s">"] : "</span> + cookies[i].<span class="f">getValue</span>() + <span class="s">"&lt;br&gt;"</span>);
+        out.<span class="f">println</span>(<span class="s">"===================================&lt;br&gt;"</span>);
+    }
+<span class="k">%&gt;</span></pre>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">localhost:8080/SessionCookie/cookie/cookie02.jsp</span></div>
+        <div class="page">
+          <div style="font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.8;color:#222">현재 설정된 쿠키의 개수 =&gt; 3<br>===================================<br>설정된 쿠키의 속성 이름 [0] : userID<br>설정된 쿠키의 속성 값 [0] : admin<br>===================================<br>설정된 쿠키의 속성 이름 [1] : userPw<br>설정된 쿠키의 속성 값 [1] : 1234<br>===================================<br>설정된 쿠키의 속성 이름 [2] : JSESSIONID<br>설정된 쿠키의 속성 값 [2] : 9AEE9E13703790BFC192AA012B319673<br>===================================</div>
+        </div>
+      </div>
+      <div class="note"><div class="lbl">💡 관찰</div> 내가 만든 <code>userId</code>·<code>userPw</code> 외에 톰캣이 발급한 <code>JSESSIONID</code>도 함께 조회됩니다. 세션 유지에 쿠키가 쓰인다는 증거입니다.</div>
+    </div>
+
+    <div class="ex"><div class="lbl">🧪 예제 ④ 쿠키 유효시간 설정 · 삭제 — expiry.jsp</div>
+      <p class="muted">쿠키는 기본적으로 <b>브라우저를 닫으면 종료</b>됩니다. <code>setMaxAge(초)</code>로 유효기간을 정하고, <code>setMaxAge(0)</code>이면 <b>삭제</b>됩니다.</p>
+<pre><span class="k">&lt;%</span>
+    <span class="t">Cookie</span>[] cookies = request.<span class="f">getCookies</span>();
+
+    <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; cookies.length; i++) {
+        <span class="c">// 쿠키 유효 시간 설정(2분)</span>
+        cookies[i].<span class="f">setMaxAge</span>(<span class="n">2</span> * <span class="n">60</span>);
+
+        <span class="c">// 쿠키 삭제</span>
+        <span class="c">// cookies[i].setMaxAge(0);</span>
+        response.<span class="f">addCookie</span>(cookies[i]);
+    }
+
+    response.<span class="f">sendRedirect</span>(<span class="s">"cookie02.jsp"</span>);
+<span class="k">%&gt;</span></pre>
+      <div class="note"><div class="lbl">⚠️ 주의</div> <code>setMaxAge()</code>로 값을 바꾼 뒤에는 반드시 <code>response.addCookie()</code>로 <b>다시 전송</b>해야 브라우저에 반영됩니다.</div>
+    </div>
+  </section>
+
+  <footer>2장. 서블릿과 세션, 쿠키 · 학습 교안<br>모듈별 학습목표 · 개념 · 예제(실행결과) · 실습문제(정답) 구성</footer>
+</div>
+
+</body>
+</html>

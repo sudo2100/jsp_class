@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3장. 액션 태그와 EL &amp; JSTL — 학습 교안</title>
+<style>
+  :root{--bg:#f4f6f9;--card:#fff;--ink:#1f2933;--muted:#52606d;--line:#e4e7eb;--accent:#e76f00;--accent2:#2c3e50;--code-bg:#282c34;--goal:#eafaf1;--goal-line:#27ae60;--ex:#eef4ff;--ex-line:#5b8def;--lab:#fff5e9;--lab-line:#e76f00;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Malgun Gothic","맑은 고딕",-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.75;}
+  header.hero{background:linear-gradient(135deg,#5382a1,#2c3e50);color:#fff;padding:52px 24px;text-align:center;}
+  header.hero .eyebrow{letter-spacing:3px;font-size:.78rem;opacity:.9;text-transform:uppercase}
+  header.hero h1{margin:12px 0 8px;font-size:1.9rem}header.hero p{margin:0;opacity:.92}
+  header.hero .tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  header.hero .tags span{background:rgba(255,255,255,.16);border-radius:999px;padding:5px 13px;font-size:.82rem}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:34px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  nav.toc h2{margin:0 0 12px;font-size:1.05rem;color:var(--accent2)}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:34px}
+  nav.toc a{color:var(--ink);text-decoration:none}nav.toc a:hover{color:var(--accent);text-decoration:underline}
+  section.module{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-bottom:26px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
+  section.module > h2{margin:0 0 6px;font-size:1.4rem;color:var(--accent2);display:flex;align-items:center;gap:12px;}
+  section.module > h2 .num{background:var(--accent);color:#fff;font-size:.95rem;font-weight:800;padding:4px 12px;border-radius:10px;min-width:38px;text-align:center;}
+  h3.blk{font-size:1.02rem;margin:22px 0 8px;font-weight:800}
+  .goal{background:var(--goal);border-left:5px solid var(--goal-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:14px 0}
+  .goal .lbl{font-weight:800;color:#1e874b}.goal ul{margin:8px 0 0}
+  .concept h3.blk{color:var(--ink);border-left:4px solid var(--accent);padding-left:10px}
+  .ex{background:var(--ex);border-left:5px solid var(--ex-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .ex .lbl{font-weight:800;color:#2f5fc7}
+  .lab{background:var(--lab);border-left:5px solid var(--lab-line);border-radius:0 10px 10px 0;padding:14px 20px;margin:16px 0}
+  .lab .lbl{font-weight:800;color:#c85f00}.lab h4{margin:6px 0 6px;font-size:.98rem}
+  .note{background:#fffbea;border-left:5px solid #f0c000;border-radius:0 10px 10px 0;padding:12px 18px;margin:14px 0}
+  .note .lbl{font-weight:800;color:#a67c00}
+  ul{margin:8px 0}li{margin:5px 0}.muted{color:var(--muted)}
+  code{background:#eceef1;padding:2px 6px;border-radius:5px;font-size:.92em;font-family:Consolas,"D2Coding",monospace}
+  pre{background:var(--code-bg);color:#abb2bf;border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:Consolas,"D2Coding",monospace;font-size:.9rem;line-height:1.6;margin:10px 0}
+  pre .k{color:#c678dd}pre .t{color:#e5c07b}pre .s{color:#98c379}pre .c{color:#7f848e;font-style:italic}pre .f{color:#61afef}pre .n{color:#d19a66}pre .g{color:#56b6c2}
+  .out{background:#1b1e24;color:#9fd18a;border-radius:8px;padding:10px 14px;font-family:Consolas,"D2Coding",monospace;font-size:.86rem;margin:6px 0 0}
+  .browser{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:6px 0 0;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .browser .bar{background:#e9edf2;padding:7px 12px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--line)}
+  .browser .bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .browser .bar .r{background:#ff5f57}.browser .bar .y{background:#febc2e}.browser .bar .gr{background:#28c840}
+  .browser .bar .url{margin-left:8px;background:#fff;border-radius:6px;padding:3px 10px;font-size:.78rem;color:var(--muted);font-family:Consolas,monospace;flex:1}
+  .browser .page{padding:16px 18px;font-size:.95rem}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:#f0f4f8;color:var(--accent2)}td.c,th.c{text-align:center}
+  details{margin-top:10px;background:#fff;border:1px solid #f0d9bf;border-radius:8px;padding:8px 14px}
+  details summary{cursor:pointer;font-weight:700;color:#c85f00}details pre{margin-top:10px}
+  .steps{counter-reset:step;list-style:none;padding-left:0;margin:10px 0}
+  .steps li{position:relative;padding-left:40px;margin:11px 0}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-1px;width:26px;height:26px;background:var(--ex-line);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
+  figure{margin:14px 0;text-align:center}
+  figure img{max-width:100%;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.07);background:#fff}
+  figure figcaption{font-size:.83rem;color:var(--muted);margin-top:7px}
+  .imgrow{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .imgrow figure{flex:1 1 300px;margin:8px 0}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:30px 20px}
+  .pill{display:inline-block;background:#eceef1;border-radius:6px;padding:2px 9px;margin:2px;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Java 웹 &amp; JSP · Chapter 03 · 학습 교안</div>
+  <h1>액션 태그와 EL &amp; JSTL</h1>
+  <p>액션 태그 · 자바빈즈 · 서블릿 포워드부터 EL · JSTL · MVC 패턴까지</p>
+  <div class="tags"><span>🏷️ 액션 태그</span><span>🫘 자바빈즈</span><span>💲 EL</span><span>🏷️ JSTL</span><span>🏗️ MVC 패턴</span></div>
+</header>
+<div class="wrap">
+  <nav class="toc">
+    <h2>📚 학습 목차</h2>
+    <ol>
+        <li><a href="#m1">액션 태그란?</a></li>
+        <li><a href="#m2">자바빈즈(JavaBeans)와 useBean &amp; 실습(Member)</a></li>
+        <li><a href="#m3">EL(표현 언어)이란? &amp; 연산자와 표현식</a></li>
+        <li><a href="#m4">EL 내장 객체와 데이터 접근</a></li>
+        <li><a href="#m5">JSTL 소개와 설치 &amp; Core 태그</a></li>
+        <li><a href="#m6">MVC 패턴과 실습</a></li>
+      </ol>
+  </nav>
+
+  <!-- M1 -->
+  <section class="module" id="m1">
+    <h2><span class="num">1</span> 액션 태그란?</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>액션 태그의 역할과 <b>XML 형식(<code>&lt;jsp:…/&gt;</code>)</b>을 이해한다.</li>
+      <li>대표적인 5가지 액션 태그의 용도를 구분할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 액션 태그(Action Tag)</h3>
+      <p>JSP에서 <b>객체 생성과 공유, 페이지 이동과 전달</b> 등의 기능을 제공하는 태그입니다. <code>&lt;% … %&gt;</code> 같은 스크립트 태그 형식이 아니라 <b>XML 형식 <code>&lt;jsp: … /&gt;</code></b>를 사용합니다.</p>
+      <table>
+        <tr><th>액션 태그</th><th>형식</th><th>설명</th></tr>
+        <tr><td>forward</td><td><code>&lt;jsp:forward … /&gt;</code></td><td>다른 페이지로의 이동 등 페이지 흐름 제어</td></tr>
+        <tr><td>include</td><td><code>&lt;jsp:include … /&gt;</code></td><td>외부 페이지의 내용을 포함하거나 페이지를 모듈화</td></tr>
+        <tr><td>useBean</td><td><code>&lt;jsp:useBean … /&gt;</code></td><td>JSP 페이지에 자바빈즈를 설정</td></tr>
+        <tr><td>setProperty</td><td><code>&lt;jsp:setProperty … /&gt;</code></td><td>자바빈즈의 프로퍼티 값을 설정</td></tr>
+        <tr><td>getProperty</td><td><code>&lt;jsp:getProperty … /&gt;</code></td><td>자바빈즈의 프로퍼티 값을 얻어옴</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="module" id="m2">
+    <h2><span class="num">2</span> 자바빈즈(JavaBeans)와 useBean &amp; 실습(Member)</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>자바빈즈의 개념과 <b>로직 분리·재사용</b>의 이점을 설명할 수 있다.</li>
+      <li><code>&lt;jsp:useBean&gt;</code>으로 빈 객체를 검색/생성할 수 있다.</li>
+      <li><code>scope</code>(생명주기 범위) 속성을 이해한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 자바빈즈(beans)란?</h3>
+      <ul>
+        <li>자바 코드를 사용하여 <b>자바 클래스로 로직을 작성</b>하는 방법이다.</li>
+        <li>자바 코드와 HTML을 함께 작성하면 기능 확장·재사용이 어렵다.</li>
+        <li>화면 표현을 위한 <b>계산식·자료 처리 자바 코드를 따로 분리</b>하여 작성한다.</li>
+      </ul>
+      <div class="note"><div class="lbl">🔄 처리 흐름</div> ① 웹 브라우저가 JSP에 <b>요청</b> → ② JSP가 <b>자바빈즈와 통신</b> → ③ 자바빈즈가 <b>데이터베이스에 연결</b> → ④ JSP가 브라우저에 <b>응답</b></div>
+    </div>
+    <div class="concept"><h3 class="blk">🔧 useBean 액션 태그</h3>
+      <p>자바빈즈를 사용하기 위해 실제 자바 클래스를 <b>선언·초기화</b>하는 태그입니다. 설정된 <code>id</code>, <code>scope</code>로 객체를 검색하고, <b>발견되지 않으면 빈 객체를 생성</b>합니다.</p>
+<pre><span class="k">&lt;jsp:useBean</span> <span class="f">id</span>=<span class="s">"식별 이름"</span> <span class="f">class</span>=<span class="s">"자바빈즈 이름"</span> <span class="f">scope</span>=<span class="s">"범위"</span><span class="k">/&gt;</span></pre>
+      <table>
+        <tr><th>속성</th><th>설명</th></tr>
+        <tr><td><code>id</code></td><td>자바빈즈를 식별하기 위한 이름</td></tr>
+        <tr><td><code>class</code></td><td>패키지 이름을 포함한 자바빈즈의 이름</td></tr>
+        <tr><td><code>scope</code></td><td><b>page(기본값)</b>, request, session, application 중 하나</td></tr>
+      </table>
+      <div class="note"><div class="lbl">💡 scope</div> 생명주기 범위를 의미합니다. <code>session</code>으로 설정하면 <b>세션 유효 범위 동안</b> 해당 인스턴스의 상태가 유지됩니다.</div>
+
+      <p class="muted" style="margin-top:14px">📋 <b>scope 4가지 정리</b> — 값이 <b>어디서 공유되고 언제까지 유지되는지</b>가 핵심입니다.</p>
+      <table>
+        <tr><th>scope</th><th>공유(생명) 범위</th><th>내장 객체</th><th>언제까지 유지?</th><th>대표 사용 예</th></tr>
+        <tr><td><b>page</b> <span class="muted">(기본값)</span></td><td>현재 JSP <b>페이지 안</b>에서만</td><td><code>pageContext</code></td><td>그 페이지 실행이 끝나면 소멸</td><td>한 페이지 내부의 임시 값</td></tr>
+        <tr><td><b>request</b></td><td>하나의 <b>요청~응답</b> (forward 포함)</td><td><code>request</code></td><td>응답이 완료되면 소멸</td><td>forward로 넘기는 데이터</td></tr>
+        <tr><td><b>session</b></td><td><b>브라우저(클라이언트)별</b></td><td><code>session</code></td><td>세션 종료(로그아웃·타임아웃)까지</td><td>로그인 사용자, 장바구니</td></tr>
+        <tr><td><b>application</b></td><td><b>웹 애플리케이션 전체</b> (모든 사용자 공유)</td><td><code>application</code></td><td>서버(웹앱)가 종료될 때까지</td><td>방문자 수, 전역 설정</td></tr>
+      </table>
+      <p class="muted">범위 크기: <code>page</code> &lt; <code>request</code> &lt; <code>session</code> &lt; <code>application</code> (아래로 갈수록 더 넓게·오래 공유)</p>
+    </div>
+  
+
+    <h3 class="blk">🧪 자바빈즈 실습 — Member</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>빈즈 클래스(<code>Member</code>)를 만들고 useBean으로 사용할 수 있다.</li>
+      <li><code>getProperty</code>/<code>setProperty</code>로 값을 읽고 설정한다.</li>
+    </ul></div>
+    <div class="ex"><div class="lbl">🧪 예제 ① 빈즈 클래스 — Member.java (package bean)</div>
+<pre><span class="k">public class</span> <span class="t">Member</span> {
+
+    <span class="k">private int</span> id = <span class="n">2025101</span>;
+    <span class="k">private</span> <span class="t">String</span> name = <span class="s">"우영우"</span>;
+
+    <span class="k">public int</span> <span class="f">getId</span>() { <span class="k">return</span> id; }
+    <span class="k">public void</span> <span class="f">setId</span>(<span class="k">int</span> id) { <span class="k">this</span>.id = id; }
+    <span class="k">public</span> <span class="t">String</span> <span class="f">getName</span>() { <span class="k">return</span> name; }
+    <span class="k">public void</span> <span class="f">setName</span>(<span class="t">String</span> name) { <span class="k">this</span>.name = name; }
+}</pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ② useBean + getProperty — member01.jsp</div>
+<pre><span class="c">&lt;!-- member는 Member 클래스의 인스턴스(객체) --&gt;</span>
+<span class="k">&lt;jsp:useBean</span> <span class="f">id</span>=<span class="s">"member"</span> <span class="f">class</span>=<span class="s">"bean.Member"</span> <span class="f">scope</span>=<span class="s">"request"</span> <span class="k">/&gt;</span>
+
+<span class="g">&lt;p&gt;</span>아이디: <span class="k">&lt;%=</span> member.<span class="f">getId</span>() <span class="k">%&gt;</span><span class="g">&lt;/p&gt;</span>
+<span class="g">&lt;p&gt;</span>이름: <span class="k">&lt;%=</span> member.<span class="f">getName</span>() <span class="k">%&gt;</span><span class="g">&lt;/p&gt;</span></pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ③ setProperty로 값 설정 — member02.jsp</div>
+<pre><span class="k">&lt;jsp:useBean</span> <span class="f">id</span>=<span class="s">"member"</span> <span class="f">class</span>=<span class="s">"bean.Member"</span> <span class="f">scope</span>=<span class="s">"request"</span><span class="k">/&gt;</span>
+<span class="k">&lt;jsp:setProperty</span> <span class="f">property</span>=<span class="s">"id"</span> <span class="f">name</span>=<span class="s">"member"</span> <span class="f">value</span>=<span class="s">"2021102"</span><span class="k">/&gt;</span>
+<span class="k">&lt;jsp:setProperty</span> <span class="f">property</span>=<span class="s">"name"</span> <span class="f">name</span>=<span class="s">"member"</span> <span class="f">value</span>=<span class="s">"안영이"</span><span class="k">/&gt;</span>
+
+<span class="g">&lt;p&gt;</span>아이디 : <span class="k">&lt;jsp:getProperty</span> <span class="f">property</span>=<span class="s">"id"</span> <span class="f">name</span>=<span class="s">"member"</span><span class="k">/&gt;</span><span class="g">&lt;/p&gt;</span>
+<span class="g">&lt;p&gt;</span>이 름 : <span class="k">&lt;jsp:getProperty</span> <span class="f">property</span>=<span class="s">"name"</span> <span class="f">name</span>=<span class="s">"member"</span><span class="k">/&gt;</span><span class="g">&lt;/p&gt;</span></pre>
+      <div class="note"><div class="lbl">💡 name vs id</div> <code>setProperty</code>·<code>getProperty</code>의 <code>name</code> 속성은 <code>useBean</code>의 <code>id</code>(빈 식별 이름)를 가리킵니다.</div>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ④ import로 직접 객체 생성 — member03.jsp</div>
+      <p class="muted">액션 태그 대신 <code>page import</code> 후 스크립트릿에서 직접 <code>new</code>로 생성할 수도 있습니다.</p>
+<pre><span class="k">&lt;%</span>
+    <span class="c">// Member 클래스 - import</span>
+    <span class="t">Member</span> member = <span class="k">new</span> <span class="t">Member</span>();
+<span class="k">%&gt;</span>
+
+<span class="g">&lt;p&gt;</span>아이디: <span class="k">&lt;%=</span> member.<span class="f">getId</span>() <span class="k">%&gt;</span><span class="g">&lt;/p&gt;</span>
+<span class="g">&lt;p&gt;</span>이름: <span class="k">&lt;%=</span> member.<span class="f">getName</span>() <span class="k">%&gt;</span><span class="g">&lt;/p&gt;</span></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m3">
+    <h2><span class="num">3</span> EL(표현 언어)이란? &amp; 연산자와 표현식</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>EL의 등장 배경과 <code>${...}</code> 구문을 이해한다.</li>
+      <li>EL이 <b>스크립트릿/표현식을 대체</b>함을 안다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 EL(Expression Language)</h3>
+      <ul>
+        <li>MVC 패턴에서 <b>뷰(View) 역할의 JSP</b>를 더 효과적으로 만들기 위해 개발되었다. (코드와 태그가 섞여 복잡해지는 문제 해결)</li>
+        <li>자바 코드를 직접 쓰지 않고, <b>간단한 표현식으로 데이터(변수·객체·속성)에 접근</b>하게 해준다.</li>
+        <li>JSP 2.0부터 도입, <b><code>${...}</code> 구문</b> 사용.</li>
+        <li>내장 객체(request, session, application 등)에 담긴 <b>속성 값을 쉽게 꺼낼 수 있다.</b></li>
+      </ul>
+      <h3 class="blk">🔁 스크립트릿·표현식을 대체</h3>
+<pre><span class="c">&lt;!-- 기존 방식 --&gt;</span>
+<span class="k">&lt;jsp:useBean</span> <span class="f">id</span>=<span class="s">"test"</span> <span class="f">class</span>=<span class="s">"TestBean"</span> <span class="k">/&gt;</span>
+<span class="k">&lt;%=</span> test.<span class="f">getName</span>() <span class="k">%&gt;</span>
+
+<span class="c">&lt;!-- EL 방식 --&gt;</span>
+${test.name}</pre>
+      <div class="note"><div class="lbl">💡 EL 문법</div> <b><code>$</code></b>로 시작하고 <b><code>{표현식}</code></b>으로 표기합니다. 표현식은 <b>변수 이름</b> 또는 <b><code>객체이름.멤버변수이름</code></b> 구조이며, 기본 연산도 가능합니다.</div>
+    </div>
+  
+
+    <h3 class="blk">🔢 EL 연산자와 표현식</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>산술·비교·논리·empty 연산자를 EL로 사용할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">🔧 표현 언어 연산자</h3>
+      <table>
+        <tr><th>산술</th><th>기능</th><th>비교</th><th>기능</th></tr>
+        <tr><td><code>+ - * /</code></td><td>더하기·빼기·곱하기·몫</td><td><code>== / eq</code>, <code>!= / ne</code></td><td>같다 / 같지 않다</td></tr>
+        <tr><td><code>%</code></td><td>나머지</td><td><code>&lt; lt</code>, <code>&gt; gt</code>, <code>&lt;= le</code>, <code>&gt;= ge</code></td><td>대소 비교</td></tr>
+      </table>
+      <table>
+        <tr><th>논리 / 기타</th><th>기능</th></tr>
+        <tr><td><code>&amp;&amp; / and</code>, <code>|| / or</code>, <code>! / not</code></td><td>AND · OR · NOT</td></tr>
+        <tr><td><code>a ? x : y</code></td><td>삼항 — a가 참이면 x, 거짓이면 y</td></tr>
+        <tr><td><code>empty &lt;값&gt;</code></td><td>값이 null이거나 빈 문자열이면 true. 예: <code>${empty param.n}</code></td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 — el01.jsp (연산자 실습)</div>
+<pre><span class="g">&lt;h3&gt;</span>문자, 숫자 데이터 표현<span class="g">&lt;/h3&gt;</span>
+${300}<span class="g">&lt;br&gt;</span>
+${<span class="s">"감사합니다."</span>}<span class="g">&lt;br&gt;</span>
+${12 * 2}     <span class="c">&lt;%-- 24 --%&gt;</span>
+${12 / 2}     <span class="c">&lt;%-- 6.0 --%&gt;</span>
+
+<span class="g">&lt;h3&gt;</span>비교, 논리 연산<span class="g">&lt;/h3&gt;</span>
+${10 == 11}<span class="g">&lt;br&gt;</span>   ${10 <span class="k">eq</span> 11}<span class="g">&lt;br&gt;</span>   ${10 != 11}<span class="g">&lt;br&gt;</span>
+${10 &lt; 11}<span class="g">&lt;br&gt;</span>    ${10 <span class="k">lt</span> 11}<span class="g">&lt;br&gt;</span>   ${10 &gt; 11}<span class="g">&lt;br&gt;</span>   ${10 <span class="k">gt</span> 11}<span class="g">&lt;br&gt;</span>
+
+${(10 &gt; 11) <span class="k">and</span> (10 != 11)}<span class="g">&lt;br&gt;</span>
+${(10 &gt; 11) <span class="k">or</span> (10 != 11)}<span class="g">&lt;br&gt;</span></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m4">
+    <h2><span class="num">4</span> EL 내장 객체와 데이터 접근</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>EL 내장 객체(request·session·application)를 안다.</li>
+      <li>속성·배열·Map을 EL로 꺼낼 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">🗄️ EL 내장 객체(데이터 저장소)</h3>
+      <table>
+        <tr><th>내장 객체</th><th>기능</th></tr>
+        <tr><td><code>request</code></td><td>request 영역 생명주기에서 사용되는 저장소</td></tr>
+        <tr><td><code>session</code></td><td>session 영역 생명주기에서 사용되는 저장소</td></tr>
+        <tr><td><code>application</code></td><td>application 영역 생명주기에서 사용되는 저장소</td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ① 객체·속성 접근 — el02.jsp</div>
+<pre><span class="c">&lt;!-- 현재 날짜 객체 생성1 (스크립트릿) --&gt;</span>
+<span class="k">&lt;%</span> <span class="t">LocalDateTime</span> datetime = <span class="t">LocalDateTime</span>.<span class="f">now</span>(); <span class="k">%&gt;</span>
+<span class="g">&lt;p&gt;</span>스크립트 출력 : <span class="k">&lt;%=</span> datetime <span class="k">%&gt;</span><span class="g">&lt;/p&gt;</span>
+
+<span class="c">&lt;!-- 현재 날짜 객체 생성2 (useBean + EL) --&gt;</span>
+<span class="k">&lt;jsp:useBean</span> <span class="f">id</span>=<span class="s">"now"</span> <span class="f">class</span>=<span class="s">"java.util.Date"</span> <span class="k">/&gt;</span>
+<span class="g">&lt;p&gt;</span>EL 출력 : ${now}<span class="g">&lt;/p&gt;&lt;hr&gt;</span>
+
+<span class="c">&lt;!-- request에 데이터 저장 --&gt;</span>
+<span class="k">&lt;%</span>
+    request.<span class="f">setAttribute</span>(<span class="s">"name"</span>, <span class="s">"한강"</span>);
+    request.<span class="f">setAttribute</span>(<span class="s">"age"</span>, <span class="n">25</span>);
+<span class="k">%&gt;</span>
+<span class="g">&lt;p&gt;</span>이름: ${name}<span class="g">&lt;/p&gt;</span>   <span class="c">&lt;%-- 한강 --%&gt;</span>
+<span class="g">&lt;p&gt;</span>나이: ${age}<span class="g">&lt;/p&gt;</span>    <span class="c">&lt;%-- 25 --%&gt;</span></pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ② 배열·Map 접근 — el02.jsp</div>
+<pre><span class="c">&lt;!-- 배열, Map 접근 --&gt;</span>
+<span class="k">&lt;%</span>
+    <span class="t">String</span>[] fruits = {<span class="s">"사과"</span>, <span class="s">"바나나"</span>, <span class="s">"포도"</span>};
+    request.<span class="f">setAttribute</span>(<span class="s">"fruits"</span>, fruits);
+<span class="k">%&gt;</span>
+<span class="g">&lt;p&gt;</span>${fruits[0]}<span class="g">&lt;/p&gt;</span>   <span class="c">&lt;%-- 사과 --%&gt;</span>
+<span class="g">&lt;p&gt;</span>${fruits[1]}<span class="g">&lt;/p&gt;</span>   <span class="c">&lt;%-- 바나나 --%&gt;</span>
+
+<span class="k">&lt;%</span>
+    <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; map = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+    map.<span class="f">put</span>(<span class="s">"k1"</span>, <span class="s">"korea"</span>);
+    map.<span class="f">put</span>(<span class="s">"j1"</span>, <span class="s">"japan"</span>);
+    request.<span class="f">setAttribute</span>(<span class="s">"map"</span>, map);
+<span class="k">%&gt;</span>
+<span class="g">&lt;p&gt;</span>${map.k1}<span class="g">&lt;/p&gt;</span>      <span class="c">&lt;%-- korea --%&gt;</span>
+<span class="g">&lt;p&gt;</span>${map[<span class="s">"j1"</span>]}<span class="g">&lt;/p&gt;</span>   <span class="c">&lt;%-- japan --%&gt;</span></pre>
+      <div class="note"><div class="lbl">💡 Map 접근</div> <code>${map.k1}</code>과 <code>${map["j1"]}</code> 두 방식 모두 가능합니다. 배열은 <code>${arr[인덱스]}</code>로 접근합니다.</div>
+    </div>
+  </section>
+
+  <section class="module" id="m5">
+    <h2><span class="num">5</span> JSTL 소개와 설치 &amp; Core 태그</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>JSTL의 개념과 5가지 라이브러리 구성을 안다.</li>
+      <li>Maven으로 JSTL 의존성을 추가하고 <code>taglib</code>로 선언할 수 있다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 JSTL(JSP Standard Tag Library)</h3>
+      <ul>
+        <li>JSP에서 자바 코드 대신 사용할 수 있는 <b>표준 태그 라이브러리</b>이다.</li>
+        <li>스크립트릿(<code>&lt;% %&gt;</code>)을 제거해 <b>가독성을 높이고</b>, 반복문·조건문·DB 연동 등을 태그로 간편하게 처리한다.</li>
+        <li>핵심(Core)·XML·I18N(국제화)·데이터베이스(SQL)·함수(Function)로 구성되며, 보통 <b>EL과 함께 사용</b>한다.</li>
+      </ul>
+      <table>
+        <tr><th>라이브러리</th><th>URI (Jakarta)</th><th>prefix</th></tr>
+        <tr><td>Core(핵심)</td><td><code>jakarta.tags.core</code></td><td><code>c</code></td></tr>
+        <tr><td>I18N(포맷)</td><td><code>jakarta.tags.fmt</code></td><td><code>fmt</code></td></tr>
+        <tr><td>데이터베이스</td><td><code>jakarta.tags.sql</code></td><td><code>sql</code></td></tr>
+        <tr><td>함수</td><td><code>jakarta.tags.functions</code></td><td><code>fn</code></td></tr>
+      </table>
+    </div>
+    <div class="concept"><h3 class="blk">📦 Maven으로 JSTL 설치</h3>
+      <p>Maven은 라이브러리의 <b>버전·종속성 관리</b>를 도와주는 빌드 도구입니다. 프로젝트를 <b>우클릭 &gt; Configure &gt; Convert to Maven Project</b>로 변환하면 <code>pom.xml</code>이 생성됩니다.</p>
+      <p class="muted">① <code>pom.xml</code>의 <code>&lt;dependencies&gt;</code>에 아래 2개 추가 → ② 프로젝트 우클릭 &gt; Maven &gt; Update Project</p>
+<pre><span class="g">&lt;dependency&gt;</span>
+    <span class="g">&lt;groupId&gt;</span>jakarta.servlet.jsp.jstl<span class="g">&lt;/groupId&gt;</span>
+    <span class="g">&lt;artifactId&gt;</span>jakarta.servlet.jsp.jstl-api<span class="g">&lt;/artifactId&gt;</span>
+    <span class="g">&lt;version&gt;</span>3.0.0<span class="g">&lt;/version&gt;</span>
+<span class="g">&lt;/dependency&gt;</span>
+<span class="g">&lt;dependency&gt;</span>
+    <span class="g">&lt;groupId&gt;</span>org.glassfish.web<span class="g">&lt;/groupId&gt;</span>
+    <span class="g">&lt;artifactId&gt;</span>jakarta.servlet.jsp.jstl<span class="g">&lt;/artifactId&gt;</span>
+    <span class="g">&lt;version&gt;</span>3.0.1<span class="g">&lt;/version&gt;</span>
+<span class="g">&lt;/dependency&gt;</span></pre>
+      <p class="muted" style="margin:16px 0 4px">▶ 설치 확인 — Project Explorer &gt; Maven Dependencies</p>
+      <div class="browser">
+        <div class="bar"><i class="r"></i><i class="y"></i><i class="gr"></i><span class="url">Project Explorer · web02 [Java-web_2026]</span></div>
+        <div class="page">
+          <div style="font-family:Consolas,"D2Coding",monospace;font-size:.86rem;line-height:1.9;color:#333">
+            📂 <b>Java Resources</b><br>
+            &nbsp;&nbsp;📂 src/main/java<br>
+            &nbsp;&nbsp;📂 <b>Libraries</b><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;📚 JRE System Library [JavaSE-21]<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;📚 <b>Maven Dependencies</b><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📦 jakarta.servlet.jsp.jstl-api-3.0.0.jar<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📦 jakarta.servlet-api-6.0.0.jar<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📦 jakarta.el-api-5.0.0.jar<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📦 jakarta.servlet.jsp.jstl-3.0.1.jar<br>
+            &nbsp;&nbsp;📚 Server Runtime [Apache Tomcat v10.1]
+          </div>
+        </div>
+      </div>
+      <h3 class="blk">🏷️ taglib 선언</h3>
+<pre><span class="k">&lt;%@</span> <span class="f">taglib</span> prefix=<span class="s">"태그 식별이름"</span> uri=<span class="s">"태그 지원 URL"</span> <span class="k">%&gt;</span>
+
+<span class="c">&lt;%-- Core 라이브러리 선언 --%&gt;</span>
+<span class="k">&lt;%@</span> <span class="f">taglib</span> prefix=<span class="s">"c"</span> uri=<span class="s">"jakarta.tags.core"</span> <span class="k">%&gt;</span></pre>
+    </div>
+  
+
+    <h3 class="blk">🏷️ JSTL Core 태그</h3>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>Core 태그(set·out·if·choose·forEach)의 형식과 용도를 안다.</li>
+      <li>조건·반복 로직을 스크립트릿 없이 태그로 작성한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">🔧 Core 태그의 종류</h3>
+      <table>
+        <tr><th>태그</th><th>설명</th></tr>
+        <tr><td><code>&lt;c:set&gt;</code></td><td>사용할 변수를 설정</td></tr>
+        <tr><td><code>&lt;c:out&gt;</code></td><td>출력에 사용</td></tr>
+        <tr><td><code>&lt;c:if&gt;</code></td><td>조건문 처리</td></tr>
+        <tr><td><code>&lt;c:forEach&gt;</code></td><td>반복문 처리</td></tr>
+        <tr><td><code>&lt;c:choose&gt; / &lt;c:when&gt; / &lt;c:otherwise&gt;</code></td><td>다중 조건문 처리</td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ① set · out · if</div>
+<pre><span class="k">&lt;%@</span> <span class="f">taglib</span> prefix=<span class="s">"c"</span> uri=<span class="s">"jakarta.tags.core"</span> <span class="k">%&gt;</span>
+...
+<span class="g">&lt;h3&gt;</span>set, out<span class="g">&lt;/h3&gt;</span>
+<span class="k">&lt;c:set</span> <span class="f">var</span>=<span class="s">"product1"</span> <span class="f">value</span>=<span class="s">"삼성 갤럭시"</span><span class="k">&gt;&lt;/c:set&gt;</span>
+<span class="k">&lt;c:set</span> <span class="f">var</span>=<span class="s">"product2"</span> <span class="f">value</span>=<span class="s">"애플 아이폰"</span><span class="k">&gt;&lt;/c:set&gt;</span>
+
+<span class="g">&lt;p&gt;</span>product1: <span class="k">&lt;c:out</span> <span class="f">value</span>=<span class="s">"${product1}"</span><span class="k">&gt;&lt;/c:out&gt;</span><span class="g">&lt;/p&gt;</span>
+<span class="g">&lt;p&gt;</span>product2: ${product2}<span class="g">&lt;/p&gt;</span>
+
+<span class="g">&lt;h3&gt;</span>if<span class="g">&lt;/h3&gt;</span>
+<span class="k">&lt;c:set</span> <span class="f">var</span>=<span class="s">"checkout"</span> <span class="f">value</span>=<span class="s">"true"</span> <span class="k">/&gt;</span>
+<span class="k">&lt;c:if</span> <span class="f">test</span>=<span class="s">"${checkout}"</span><span class="k">&gt;</span>
+    <span class="g">&lt;p&gt;</span>주문 제품: ${product2}
+<span class="k">&lt;/c:if&gt;</span>
+
+<span class="k">&lt;c:if</span> <span class="f">test</span>=<span class="s">"${!checkout}"</span><span class="k">&gt;</span> <span class="c">&lt;!-- false이면 실행 --&gt;</span>
+    <span class="g">&lt;p&gt;</span>주문 제품이 아님
+<span class="k">&lt;/c:if&gt;</span>
+
+<span class="k">&lt;c:if</span> <span class="f">test</span>=<span class="s">"${not empty product1}"</span><span class="k">&gt;</span> <span class="c">&lt;!-- empty이면 출력안됨 --&gt;</span>
+    <span class="g">&lt;p&gt;</span>${product1} 이미 추가됨
+<span class="k">&lt;/c:if&gt;</span></pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ② forEach (배열 반복)</div>
+<pre><span class="g">&lt;h3&gt;</span>forEach<span class="g">&lt;/h3&gt;</span>
+<span class="c">&lt;!-- value="${[10, 20, 30, 40]}"도 가능 --&gt;</span>
+<span class="k">&lt;c:set</span> <span class="f">var</span>=<span class="s">"intArray"</span> <span class="f">value</span>=<span class="s">"${{10, 20, 30, 40}}"</span> <span class="k">/&gt;</span>
+<span class="g">&lt;ul&gt;</span>
+    <span class="k">&lt;c:forEach</span> <span class="f">var</span>=<span class="s">"num"</span> <span class="f">items</span>=<span class="s">"${intArray}"</span><span class="k">&gt;</span>
+        <span class="g">&lt;li&gt;</span>${num}<span class="g">&lt;/li&gt;</span>
+    <span class="k">&lt;/c:forEach&gt;</span>
+<span class="g">&lt;/ul&gt;</span></pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 예제 ③ 짝수/홀수 판정 (c:if)</div>
+<pre><span class="k">&lt;%@</span> <span class="f">taglib</span> prefix=<span class="s">"c"</span> uri=<span class="s">"jakarta.tags.core"</span> <span class="k">%&gt;</span>
+...
+<span class="k">&lt;c:set</span> <span class="f">var</span>=<span class="s">"num"</span> <span class="f">value</span>=<span class="s">"12"</span> <span class="k">/&gt;</span>
+
+<span class="c">&lt;!-- c:if문 사용 --&gt;</span>
+<span class="k">&lt;c:if</span> <span class="f">test</span>=<span class="s">"${num % 2 == 0}"</span><span class="k">&gt;</span>
+    <span class="k">&lt;c:out</span> <span class="f">value</span>=<span class="s">"${num}은(는) ${'짝수입니다.'}"</span> <span class="k">/&gt;</span>
+<span class="k">&lt;/c:if&gt;</span>
+<span class="k">&lt;c:if</span> <span class="f">test</span>=<span class="s">"${num % 2 == 1}"</span><span class="k">&gt;</span>
+    <span class="k">&lt;c:out</span> <span class="f">value</span>=<span class="s">"${num}은(는) ${'홀수입니다.'}"</span> <span class="k">/&gt;</span>
+<span class="k">&lt;/c:if&gt;</span></pre>
+    </div>
+  </section>
+
+  <section class="module" id="m6">
+    <h2><span class="num">6</span> MVC 패턴과 실습</h2>
+    <div class="goal"><div class="lbl">🎯 학습목표</div><ul>
+      <li>MVC(Model·View·Controller)의 역할 분담을 설명할 수 있다.</li>
+      <li>서블릿(컨트롤러)→JSP(뷰) 구조로 데이터를 전달·출력한다.</li>
+    </ul></div>
+    <div class="concept"><h3 class="blk">📖 MVC란?</h3>
+      <p>웹 애플리케이션을 <b>비즈니스 로직·프레젠테이션 로직·데이터</b>로 분리하는 디자인 패턴입니다. 요청 처리·응답 처리·로직 처리를 모듈화합니다.</p>
+      <table>
+        <tr><th>구성</th><th>역할</th></tr>
+        <tr><td><b>Controller</b></td><td><b>서블릿</b>이 담당. 요청 분석 → 필요한 모델 호출 → 결과를 보여줄 JSP 선택</td></tr>
+        <tr><td><b>Model</b></td><td>DB 연동 등 비즈니스 로직. <b>DTO(VO)·DAO</b> 클래스로 구성</td></tr>
+        <tr><td><b>View</b></td><td><b>JSP</b>가 화면 담당. 모델이 처리한 결과를 화면에 표시</td></tr>
+      </table>
+    </div>
+    <div class="ex"><div class="lbl">🧪 실습 ① 컨트롤러(서블릿) — ModelServlet.java</div>
+      <p class="muted">모델 데이터를 만들어 <code>request</code>에 담고 뷰(mvc01.jsp)로 <b>forward</b>합니다.</p>
+      <div class="note"><div class="lbl">⚠️ 주의</div> 반드시 <b>서블릿에서 서버를 먼저 실행</b>해야 뷰(view)에 데이터가 전달됩니다. (JSP를 직접 실행하면 컨트롤러를 거치지 않아 <code>${...}</code>가 비어 있음)</div>
+<pre><span class="k">package</span> com.space.mvc.model;
+
+<span class="n">@WebServlet</span>(<span class="s">"/model"</span>) <span class="c">//http://localhost:8080/web02/model</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">ModelServlet</span> <span class="k">extends</span> <span class="t">HttpServlet</span> {
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">long</span> serialVersionUID = <span class="n">1L</span>;
+
+    <span class="k">protected</span> <span class="k">void</span> <span class="f">doGet</span>(<span class="t">HttpServletRequest</span> request, <span class="t">HttpServletResponse</span> response) <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> {
+        <span class="c">// 변수</span>
+        <span class="t">String</span> season = <span class="s">"가을"</span>;
+        
+        <span class="c">// 배열</span>
+        <span class="t">String</span>[] seasons = {<span class="s">"봄"</span>, <span class="s">"여름"</span>, <span class="s">"가을"</span>, <span class="s">"겨울"</span>};
+        
+        <span class="c">// "season"을 모델로 뷰(mvc01)에 전달</span>
+        request.<span class="f">setAttribute</span>(<span class="s">"season"</span>, season);
+        request.<span class="f">setAttribute</span>(<span class="s">"seasons"</span>, seasons);
+        
+        <span class="c">// "fruits"을 모델로 뷰(mvc01)에 전달</span>
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; fruits = <span class="t">Arrays</span>.<span class="f">asList</span>(<span class="s">"사과"</span>, <span class="s">"바나나"</span>, <span class="s">"딸기"</span>);
+        request.<span class="f">setAttribute</span>(<span class="s">"fruits"</span>, fruits);
+        
+        <span class="c">// "cars"을 모델로 뷰(mvc01)에 전달</span>
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Object</span>&gt; cars = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+        cars.<span class="f">put</span>(<span class="s">"brand"</span>, <span class="s">"EV6"</span>);
+        cars.<span class="f">put</span>(<span class="s">"year"</span>, <span class="n">2025</span>);
+        request.<span class="f">setAttribute</span>(<span class="s">"cars"</span>, cars);
+        
+        <span class="c">// 포워딩: model -&gt; view로 전달</span>
+        <span class="c">/*RequestDispatcher rd = </span>
+<span class="c">                request.getRequestDispatcher("/mvc/mvc01.jsp");</span>
+<span class="c">        rd.forward(request, response);*/</span>
+        
+        request.<span class="f">getRequestDispatcher</span>(<span class="s">"/mvc/mvc01.jsp"</span>).<span class="f">forward</span>(request, response);
+    }
+}</pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 실습 ② 뷰 — mvc01.jsp (EL + JSTL)</div>
+<pre><span class="g">&lt;h3&gt;</span>변수, 배열<span class="g">&lt;/h3&gt;</span>
+<span class="g">&lt;p&gt;</span>현재 계절: ${season}<span class="g">&lt;/p&gt;</span>
+<span class="g">&lt;p&gt;</span>현재 계절 : ${seasons[2]}<span class="g">&lt;/p&gt;</span>
+<span class="g">&lt;p&gt;</span>전체 계절<span class="g">&lt;/p&gt;</span>
+<span class="k">&lt;c:forEach</span> <span class="f">var</span>=<span class="s">"season"</span> <span class="f">items</span>=<span class="s">"${seasons}"</span><span class="k">&gt;</span>
+    ${season} <span class="g">&lt;br&gt;</span>
+<span class="k">&lt;/c:forEach&gt;</span>
+<span class="g">&lt;hr&gt;</span>
+<span class="g">&lt;h3&gt;</span>리스트(List)<span class="g">&lt;/h3&gt;</span>
+<span class="g">&lt;p&gt;</span>과일: ${fruits[0]}
+<span class="g">&lt;p&gt;</span>과일 장바구니:
+<span class="k">&lt;c:forEach</span> <span class="f">var</span>=<span class="s">"fruit"</span> <span class="f">items</span>=<span class="s">"${fruits}"</span><span class="k">&gt;</span>
+    ${fruit}
+<span class="k">&lt;/c:forEach&gt;</span>
+<span class="g">&lt;hr&gt;</span>
+<span class="g">&lt;h3&gt;</span>맵(Map)<span class="g">&lt;/h3&gt;</span>
+<span class="g">&lt;p&gt;</span>모델명: ${cars.brand}
+<span class="g">&lt;p&gt;</span>연식: ${cars.year}</pre>
+    </div>
+    <div class="concept"><h3 class="blk">🛒 MVC 실습 — 장바구니 프로그램 (Model 2)</h3>
+      <p class="muted">기존 Model 1 방식의 장바구니(스크립틀릿으로 세션 리스트를 직접 다루던 <code>addProduct.jsp</code> 등)를 <b>Model 2(MVC)</b>로 변환한 예제입니다. 하나의 컨트롤러(<code>CartServlet</code>)에서 <code>command</code> 파라미터로 로그인·담기·목록을 분기합니다.</p>
+      <table>
+        <tr><th>파일 이름</th><th>계층</th><th>역할</th></tr>
+        <tr><td><code>Cart.java</code></td><td class="c"><b>Model</b></td><td>선택한 상품 목록을 담는 객체(세션에 저장)</td></tr>
+        <tr><td><code>CartServlet.java</code></td><td class="c"><b>Controller</b></td><td><code>/cart</code> — command로 로그인/담기/목록 분기 후 뷰로 forward</td></tr>
+        <tr><td><code>loginForm.jsp</code></td><td class="c"><b>View</b></td><td>로그인 폼</td></tr>
+        <tr><td><code>selProduct.jsp</code></td><td class="c"><b>View</b></td><td>상품 선택 + 추가 결과 메시지</td></tr>
+        <tr><td><code>cart.jsp</code></td><td class="c"><b>View</b></td><td>담긴 상품 목록 출력</td></tr>
+      </table>
+      <div class="note"><div class="lbl">🔄 command 분기 흐름</div>
+        <code>/cart?command=login</code> → 이름 세션 저장 → selProduct.jsp<br>
+        <code>/cart?command=add</code> → 세션의 <code>Cart</code>에 상품 추가(+메시지) → selProduct.jsp<br>
+        <code>/cart?command=list</code> → cart.jsp에서 <code>${cart.productList}</code> 출력</div>
+    </div>
+    <div class="ex"><div class="lbl">🧪 ① Model — Cart.java</div>
+<pre><span class="k">package</span> com.space.mvc.model;
+
+<span class="c">// 선택한 상품 목록을 보관 (세션에 저장되어 사용자별 장바구니 유지)</span>
+<span class="k">public class</span> <span class="t">Cart</span> {
+    <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; productList = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+    <span class="c">// 상품 추가</span>
+    <span class="k">public void</span> <span class="f">addProduct</span>(<span class="t">String</span> product) {
+        productList.<span class="f">add</span>(product);
+    }
+    <span class="c">// 목록 반환 (View에서 ${cart.productList}로 접근)</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; <span class="f">getProductList</span>() {
+        <span class="k">return</span> productList;
+    }
+}</pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 ② Controller — CartServlet.java</div>
+<pre><span class="n">@WebServlet</span>(<span class="s">"/cart"</span>)
+<span class="k">public class</span> <span class="t">CartServlet</span> <span class="k">extends</span> <span class="t">HttpServlet</span> {
+
+    <span class="k">protected void</span> <span class="f">doGet</span>(<span class="t">HttpServletRequest</span> req, <span class="t">HttpServletResponse</span> res)
+            <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> { <span class="f">process</span>(req, res); }
+    <span class="k">protected void</span> <span class="f">doPost</span>(<span class="t">HttpServletRequest</span> req, <span class="t">HttpServletResponse</span> res)
+            <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> { <span class="f">process</span>(req, res); }
+
+    <span class="k">private void</span> <span class="f">process</span>(<span class="t">HttpServletRequest</span> request, <span class="t">HttpServletResponse</span> response)
+            <span class="k">throws</span> <span class="t">ServletException</span>, <span class="t">IOException</span> {
+        request.<span class="f">setCharacterEncoding</span>(<span class="s">"UTF-8"</span>);
+        <span class="t">String</span> command = request.<span class="f">getParameter</span>(<span class="s">"command"</span>);
+        <span class="t">HttpSession</span> session = request.<span class="f">getSession</span>();
+        <span class="t">String</span> view;
+
+        <span class="k">if</span> (<span class="s">"login"</span>.<span class="f">equals</span>(command)) {              <span class="c">// 로그인</span>
+            session.<span class="f">setAttribute</span>(<span class="s">"sessionName"</span>, request.<span class="f">getParameter</span>(<span class="s">"username"</span>));
+            view = <span class="s">"/carts/selProduct.jsp"</span>;
+        } <span class="k">else if</span> (<span class="s">"add"</span>.<span class="f">equals</span>(command)) {        <span class="c">// 상품 담기</span>
+            <span class="t">Cart</span> cart = (<span class="t">Cart</span>) session.<span class="f">getAttribute</span>(<span class="s">"cart"</span>);
+            <span class="k">if</span> (cart == <span class="k">null</span>) { cart = <span class="k">new</span> <span class="t">Cart</span>(); session.<span class="f">setAttribute</span>(<span class="s">"cart"</span>, cart); }
+            <span class="t">String</span> product = request.<span class="f">getParameter</span>(<span class="s">"product"</span>);
+            cart.<span class="f">addProduct</span>(product);
+            request.<span class="f">setAttribute</span>(<span class="s">"message"</span>, product + <span class="s">"가(이) 추가되었습니다."</span>);
+            view = <span class="s">"/carts/selProduct.jsp"</span>;
+        } <span class="k">else if</span> (<span class="s">"list"</span>.<span class="f">equals</span>(command)) {       <span class="c">// 장바구니 목록</span>
+            view = <span class="s">"/carts/cart.jsp"</span>;
+        } <span class="k">else</span> {                                    <span class="c">// 기본: 로그인 폼</span>
+            view = <span class="s">"/carts/loginForm.jsp"</span>;
+        }
+        request.<span class="f">getRequestDispatcher</span>(view).<span class="f">forward</span>(request, response);
+    }
+}</pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 ③ View — loginForm.jsp</div>
+<pre><span class="g">&lt;section</span> <span class="f">id</span>=<span class="s">"container"</span><span class="g">&gt;</span>
+    <span class="g">&lt;h2&gt;</span>로그인<span class="g">&lt;/h2&gt;&lt;hr&gt;</span>
+    <span class="c">&lt;!-- 컨트롤러(/cart)로 요청, command=login --&gt;</span>
+    <span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"${pageContext.request.contextPath}/cart"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+        <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"hidden"</span> <span class="f">name</span>=<span class="s">"command"</span> <span class="f">value</span>=<span class="s">"login"</span><span class="g">&gt;</span>
+        <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"text"</span> <span class="f">name</span>=<span class="s">"username"</span> <span class="f">placeholder</span>=<span class="s">"이름 입력"</span><span class="g">&gt;</span>
+        <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"submit"</span> <span class="f">value</span>=<span class="s">"로그인"</span><span class="g">&gt;</span>
+    <span class="g">&lt;/form&gt;</span>
+<span class="g">&lt;/section&gt;</span></pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 ④ View — selProduct.jsp (EL + JSTL)</div>
+<pre><span class="k">&lt;%@</span> <span class="f">taglib</span> prefix=<span class="s">"c"</span> uri=<span class="s">"jakarta.tags.core"</span> <span class="k">%&gt;</span>
+...
+<span class="g">&lt;section</span> <span class="f">id</span>=<span class="s">"container"</span><span class="g">&gt;</span>
+    <span class="g">&lt;h2&gt;</span>상품 선택<span class="g">&lt;/h2&gt;&lt;hr&gt;</span>
+    <span class="g">&lt;p&gt;&lt;b&gt;</span>[${sessionName}]<span class="g">&lt;/b&gt;</span>님 환영합니다.<span class="g">&lt;/p&gt;</span>
+
+    <span class="c">&lt;!-- 추가 결과 메시지 --&gt;</span>
+    <span class="k">&lt;c:if</span> <span class="f">test</span>=<span class="s">"${not empty message}"</span><span class="k">&gt;</span>
+        <span class="g">&lt;p</span> <span class="f">class</span>=<span class="s">"message"</span><span class="g">&gt;</span>${message}<span class="g">&lt;/p&gt;</span>
+    <span class="k">&lt;/c:if&gt;</span>
+
+    <span class="c">&lt;!-- command=add 로 상품 담기 --&gt;</span>
+    <span class="g">&lt;form</span> <span class="f">action</span>=<span class="s">"${pageContext.request.contextPath}/cart"</span> <span class="f">method</span>=<span class="s">"post"</span><span class="g">&gt;</span>
+        <span class="g">&lt;input</span> <span class="f">type</span>=<span class="s">"hidden"</span> <span class="f">name</span>=<span class="s">"command"</span> <span class="f">value</span>=<span class="s">"add"</span><span class="g">&gt;</span>
+        <span class="g">&lt;select</span> <span class="f">name</span>=<span class="s">"product"</span><span class="g">&gt;</span>
+            <span class="g">&lt;option&gt;</span>사과<span class="g">&lt;/option&gt;&lt;option&gt;</span>바나나<span class="g">&lt;/option&gt;&lt;option&gt;</span>포도<span class="g">&lt;/option&gt;</span>
+        <span class="g">&lt;/select&gt;</span>
+        <span class="g">&lt;button</span> <span class="f">type</span>=<span class="s">"submit"</span><span class="g">&gt;</span>추가<span class="g">&lt;/button&gt;</span>
+    <span class="g">&lt;/form&gt;</span>
+
+    <span class="c">&lt;!-- command=list 로 장바구니 보기 --&gt;</span>
+    <span class="g">&lt;button</span> <span class="f">onclick</span>=<span class="s">"location.href='${pageContext.request.contextPath}/cart?command=list'"</span><span class="g">&gt;</span>장바구니<span class="g">&lt;/button&gt;</span>
+<span class="g">&lt;/section&gt;</span></pre>
+    </div>
+    <div class="ex"><div class="lbl">🧪 ⑤ View — cart.jsp (EL + JSTL)</div>
+<pre><span class="k">&lt;%@</span> <span class="f">taglib</span> prefix=<span class="s">"c"</span> uri=<span class="s">"jakarta.tags.core"</span> <span class="k">%&gt;</span>
+...
+<span class="g">&lt;section</span> <span class="f">id</span>=<span class="s">"container"</span><span class="g">&gt;</span>
+    <span class="g">&lt;h2&gt;</span>장바구니<span class="g">&lt;/h2&gt;</span>
+    <span class="g">&lt;h3&gt;</span>선택한 상품 목록<span class="g">&lt;/h3&gt;&lt;hr&gt;</span>
+
+    <span class="c">&lt;!-- 세션 Cart 모델에서 목록 출력 (스크립틀릿 없음) --&gt;</span>
+    <span class="k">&lt;c:choose&gt;</span>
+        <span class="k">&lt;c:when</span> <span class="f">test</span>=<span class="s">"${not empty cart.productList}"</span><span class="k">&gt;</span>
+            <span class="k">&lt;c:forEach</span> <span class="f">var</span>=<span class="s">"product"</span> <span class="f">items</span>=<span class="s">"${cart.productList}"</span><span class="k">&gt;</span>
+                ${product}<span class="g">&lt;br&gt;</span>
+            <span class="k">&lt;/c:forEach&gt;</span>
+        <span class="k">&lt;/c:when&gt;</span>
+        <span class="k">&lt;c:otherwise&gt;</span>
+            <span class="g">&lt;p&gt;</span>장바구니가 비어 있습니다.<span class="g">&lt;/p&gt;</span>
+        <span class="k">&lt;/c:otherwise&gt;</span>
+    <span class="k">&lt;/c:choose&gt;</span>
+<span class="g">&lt;/section&gt;</span></pre>
+      <div class="note"><div class="lbl">💡 Model 1 → Model 2 핵심 변화</div> ① 비즈니스 로직(상품 담기·세션 처리)을 JSP → <b>CartServlet(Controller)</b>로 이동, ② 데이터를 <code>List</code> 직접 저장 → <b><code>Cart</code> 모델 객체로 캡슐화</b>, ③ 뷰의 스크립틀릿(<code>&lt;% %&gt;</code>)을 전부 제거하고 <b>EL + JSTL</b>로 출력, ④ 폼 action을 <b>컨트롤러(<code>/cart</code>)</b>로 향하게 변경.</div>
+    </div>
+  </section>
+
+  <footer>3장. 액션 태그와 EL &amp; JSTL · 학습 교안<br>모듈별 학습목표 · 개념 · 예제(실행결과) · 실습 구성</footer>
+</div>
+
+</body>
+</html>
